@@ -1,3 +1,5 @@
+(ns inteprete-scheme.core)
+
 (require '[clojure.string :as st :refer [blank? starts-with? ends-with? lower-case]]
          '[clojure.java.io :refer [delete-file reader]]
          '[clojure.walk :refer [postwalk postwalk-replace]])
@@ -539,13 +541,19 @@
 ; user=> (leer-entrada)
 ; 123
 ; "123"
-(defn leer-entrada
+(defn leer-entrada[]
   "Lee una cadena desde la terminal/consola. Si los parentesis no estan correctamente balanceados al presionar Enter/Intro,
-   se considera que la cadena ingresada es una subcadena y el ingreso continua. De lo contrario, se la devuelve completa."
-  (if verificar-parentesis)
-  
+   se considera que la cadena ingresada es una subcadena y el ingreso continua. De lo contrario, se la devuelve completa."  
 )
 
+(defn contar-parentesis [lista posicion contador]
+  (cond    
+    (< contador 0) -1
+    (= posicion (count lista)) contador
+    (= (nth lista posicion) "(") (contar-parentesis lista (inc posicion) (inc contador)) 
+    (= (nth lista posicion) ")") (contar-parentesis lista (inc posicion) (dec contador)) 
+  )  
+)
 ; user=> (verificar-parentesis "(hola 'mundo")
 ; 1
 ; user=> (verificar-parentesis "(hola '(mundo)))")
@@ -558,7 +566,7 @@
 ; 0
 (defn verificar-parentesis [una-cadena]
   "Cuenta los parentesis en una cadena, sumando 1 si `(`, restando 1 si `)`. Si el contador se hace negativo, para y retorna -1."
-  (filter #(["()"]) una-cadena)
+  (contar-parentesis (re-seq #"[()]" una-cadena) 0 0)
 )
 
 ; user=> (actualizar-amb '(a 1 b 2 c 3) 'd 4)
@@ -569,7 +577,7 @@
 ; (a 1 b 2 c 3)
 ; user=> (actualizar-amb () 'b 7)
 ; (b 7)
-(defn actualizar-amb
+(defn actualizar-amb[]
   "Devuelve un ambiente actualizado con una clave (nombre de la variable o funcion) y su valor. 
   Si el valor es un error, el ambiente no se modifica. De lo contrario, se le carga o reemplaza la nueva informacion."
 )
@@ -578,7 +586,7 @@
 ; 3
 ; user=> (buscar 'f '(a 1 b 2 c 3 d 4 e 5))
 ; (;ERROR: unbound variable: f)
-(defn buscar
+(defn buscar[]
   "Busca una clave en un ambiente (una lista con claves en las posiciones impares [1, 3, 5...] y valores en las pares [2, 4, 6...]
    y devuelve el valor asociado. Devuelve un error :unbound-variable si no la encuentra."
 )
@@ -589,7 +597,7 @@
 ; false
 ; user=> (error? (list (symbol ";WARNING:") 'mal 'hecho))
 ; true
-(defn error?
+(defn error?[]
   "Devuelve true o false, segun sea o no el arg. una lista con `;ERROR:` o `;WARNING:` como primer elemento."
 )
 
@@ -599,7 +607,7 @@
 ; "(and (or %F %f %t %T) %T)"
 ; user=> (proteger-bool-en-str "")
 ; ""
-(defn proteger-bool-en-str
+(defn proteger-bool-en-str[]
   "Cambia, en una cadena, #t por %t y #f por %f (y sus respectivas versiones en mayusculas), para poder aplicarle read-string."
 )
 
@@ -607,7 +615,7 @@
 ; (and (or #F #f #t #T) #T)
 ; user=> (restaurar-bool (read-string "(and (or %F %f %t %T) %T)") )
 ; (and (or #F #f #t #T) #T)
-(defn restaurar-bool
+(defn restaurar-bool[]
   "Cambia, en un codigo leido con read-string, %t por #t y %f por #f (y sus respectivas versiones en mayusculas)."
 )
 
@@ -621,7 +629,7 @@
 ; false
 ; user=> (igual? 6 "6")
 ; false
-(defn igual?
+(defn igual?[]
   "Verifica la igualdad entre dos elementos al estilo de Scheme (case-insensitive)"
 )
 
@@ -631,7 +639,7 @@
 ; (;ERROR: append: Wrong type in arg 3)
 ; user=> (fnc-append '( (1 2) A (4 5) (6 7)))
 ; (;ERROR: append: Wrong type in arg A)
-(defn fnc-append
+(defn fnc-append[]
   "Devuelve el resultado de fusionar listas."
 )
 
@@ -666,7 +674,7 @@
 ; (;ERROR: Wrong number of args given #<primitive-procedure read>)
 ; user=> (fnc-read '(1 2 3))
 ; (;ERROR: Wrong number of args given #<primitive-procedure read>)
-(defn fnc-read
+(defn fnc-read[]
   "Devuelve la lectura de un elemento de Scheme desde la terminal/consola."
 )
 
@@ -707,7 +715,7 @@
 ; (;ERROR: -: Wrong type in arg2 A)
 ; user=> (fnc-restar '(3 4 A 6))
 ; (;ERROR: -: Wrong type in arg2 A)
-(defn fnc-restar
+(defn fnc-restar[]
   "Resta los elementos de un lista."
 )
 
@@ -796,7 +804,7 @@
 ; ("hola" (x 6 y 11 z "hola"))
 ; user=> (evaluar-escalar 'n '(x 6 y 11 z "hola"))
 ; ((;ERROR: unbound variable: n) (x 6 y 11 z "hola"))
-(defn evaluar-escalar
+(defn evaluar-escalar[]
   "Evalua una expresion escalar. Devuelve una lista con el resultado y un ambiente."
 )
 
@@ -816,7 +824,7 @@
 ; ((;ERROR: define: bad variable (define () 2)) (x 1))
 ; user=> (evaluar-define '(define 2 x) '(x 1))
 ; ((;ERROR: define: bad variable (define 2 x)) (x 1))
-(defn evaluar-define
+(defn evaluar-define[]
   "Evalua una expresion `define`. Devuelve una lista con el resultado y un ambiente actualizado con la definicion."
 )
 
@@ -836,7 +844,7 @@
 ; ((;ERROR: if: missing or extra expression (if)) (n 7))
 ; user=> (evaluar-if '(if 1) '(n 7))
 ; ((;ERROR: if: missing or extra expression (if 1)) (n 7))
-(defn evaluar-if
+(defn evaluar-if[]
   "Evalua una expresion `if`. Devuelve una lista con el resultado y un ambiente eventualmente modificado."
 )
 
@@ -850,7 +858,7 @@
 ; (5 (#f #f #t #t))
 ; user=> (evaluar-or (list 'or (symbol "#f")) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))
 ; (#f (#f #f #t #t))
-(defn evaluar-or
+(defn evaluar-or[]
   "Evalua una expresion `or`.  Devuelve una lista con el resultado y un ambiente."
 )
 
@@ -864,7 +872,7 @@
 ; ((;ERROR: set!: missing or extra expression (set! x 1 2)) (x 0))
 ; user=> (evaluar-set! '(set! 1 2) '(x 0))
 ; ((;ERROR: set!: bad variable 1) (x 0))
-(defn evaluar-set!
+(defn evaluar-set![]
   "Evalua una expresion `set!`. Devuelve una lista con el resultado y un ambiente actualizado con la redefinicion."
 )
 
