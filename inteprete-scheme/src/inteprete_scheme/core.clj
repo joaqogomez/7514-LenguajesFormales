@@ -597,8 +597,13 @@
 ; false
 ; user=> (error? (list (symbol ";WARNING:") 'mal 'hecho))
 ; true
-(defn error?[]
+(defn error? [lista]
   "Devuelve true o false, segun sea o no el arg. una lista con `;ERROR:` o `;WARNING:` como primer elemento."
+  (cond
+    (not (list? lista)) false
+    (= (count lista) 0) false
+    :else (or (= (nth lista 0) (symbol ";ERROR:")) (= (nth lista 0) (symbol ";WARNING:")))
+  )  
 )
 
 ; user=> (proteger-bool-en-str "(or #F #f #t #T)")
