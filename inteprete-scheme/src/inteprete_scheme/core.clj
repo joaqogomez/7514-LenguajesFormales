@@ -542,6 +542,8 @@
 (defn leer-entrada
   "Lee una cadena desde la terminal/consola. Si los parentesis no estan correctamente balanceados al presionar Enter/Intro,
    se considera que la cadena ingresada es una subcadena y el ingreso continua. De lo contrario, se la devuelve completa."
+  (if verificar-parentesis)
+  
 )
 
 ; user=> (verificar-parentesis "(hola 'mundo")
@@ -554,8 +556,9 @@
 ; -1
 ; user=> (verificar-parentesis "(hola '(mundo) )")
 ; 0
-(defn verificar-parentesis
+(defn verificar-parentesis [una-cadena]
   "Cuenta los parentesis en una cadena, sumando 1 si `(`, restando 1 si `)`. Si el contador se hace negativo, para y retorna -1."
+  (filter #(["()"]) una-cadena)
 )
 
 ; user=> (actualizar-amb '(a 1 b 2 c 3) 'd 4)
@@ -648,8 +651,9 @@
 ; #t
 ; user=> (fnc-equal? '(1 1 2 1))
 ; #f
-(defn fnc-equal?
+(defn fnc-equal?[lista-elementos]
   "Compara elementos. Si son iguales, devuelve #t. Si no, #f."
+  (apply igual? lista-elementos)
 )
 
 ; user=> (fnc-read ())
@@ -682,8 +686,9 @@
 ; (;ERROR: +: Wrong type in arg2 A)
 ; user=> (fnc-sumar '(3 4 A 6))
 ; (;ERROR: +: Wrong type in arg2 A)
-(defn fnc-sumar
+(defn fnc-sumar[lista-numeros]
   "Suma los elementos de una lista."
+  (apply + lista-numeros)
 )
 
 ; user=> (fnc-restar ())
@@ -726,8 +731,9 @@
 ; (;ERROR: <: Wrong type in arg2 A)
 ; user=> (fnc-menor '(1 2 A 4))
 ; (;ERROR: <: Wrong type in arg2 A)
-(defn fnc-menor
+(defn fnc-menor[lista-numeros]
   "Devuelve #t si los numeros de una lista estan en orden estrictamente creciente; si no, #f."
+  (apply < lista-numeros)
 )
 
 ; user=> (fnc-mayor ())
@@ -750,8 +756,9 @@
 ; (;ERROR: >: Wrong type in arg2 A)
 ; user=> (fnc-mayor '(3 2 A 1))
 ; (;ERROR: >: Wrong type in arg2 A)
-(defn fnc-mayor
+(defn fnc-mayor [lista-numeros]
   "Devuelve #t si los numeros de una lista estan en orden estrictamente decreciente; si no, #f."
+    (apply > lista-numeros)
 )
 
 ; user=> (fnc-mayor-o-igual ())
@@ -774,8 +781,9 @@
 ; (;ERROR: >=: Wrong type in arg2 A)
 ; user=> (fnc-mayor-o-igual '(3 2 A 1))
 ; (;ERROR: >=: Wrong type in arg2 A)
-(defn fnc-mayor-o-igual
+(defn fnc-mayor-o-igual [lista-numeros]
   "Devuelve #t si los numeros de una lista estan en orden decreciente; si no, #f."
+  (not (fnc-menor lista-numeros))
 )
 
 ; user=> (evaluar-escalar 32 '(x 6 y 11 z "hola"))
