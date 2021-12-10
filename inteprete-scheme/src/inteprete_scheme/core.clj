@@ -614,6 +614,7 @@
 ; ""
 (defn proteger-bool-en-str[]
   "Cambia, en una cadena, #t por %t y #f por %f (y sus respectivas versiones en mayusculas), para poder aplicarle read-string."
+
 )
 
 ; user=> (restaurar-bool (read-string (proteger-bool-en-str "(and (or #F #f #t #T) #T)")))
@@ -634,8 +635,12 @@
 ; false
 ; user=> (igual? 6 "6")
 ; false
-(defn igual?[]
+(defn igual?[un-elemento otro-elemento]
   "Verifica la igualdad entre dos elementos al estilo de Scheme (case-insensitive)"
+  (cond
+    (not (= (type un-elemento) (type otro-elemento))) false
+    :else (= (st/lower-case (str un-elemento)) (st/lower-case(str otro-elemento)))
+  )
 )
 
 ; user=> (fnc-append '( (1 2) (3) (4 5) (6 7)))

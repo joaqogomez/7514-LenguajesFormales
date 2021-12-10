@@ -34,3 +34,24 @@
     )
   ) 
 )
+
+(deftest test-igual?
+  (testing "Testeo la funcion igual?"
+    (is (= true 
+        (igual? 'if 'IF)))
+    (is (= true 
+        (igual? 'if 'if)))
+    (is (= true 
+        (igual? 'IF 'IF)))
+    (is (= false 
+        (igual? 'IF "IF")))
+    (is (= false 
+        (igual? 6 "6")))
+    (is (= true 
+    (igual? '(a b C) '(A B C))))
+    (is (= true 
+    (igual? '((a b) C) '((A B) C))))
+    (is (= true 
+    (igual? '() '())))
+  ) 
+)
