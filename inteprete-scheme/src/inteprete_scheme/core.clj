@@ -577,18 +577,32 @@
 ; (a 1 b 2 c 3)
 ; user=> (actualizar-amb () 'b 7)
 ; (b 7)
-(defn actualizar-amb[]
+(defn actualizar-amb [ambiente clave valor]
   "Devuelve un ambiente actualizado con una clave (nombre de la variable o funcion) y su valor. 
   Si el valor es un error, el ambiente no se modifica. De lo contrario, se le carga o reemplaza la nueva informacion."
+  (cond
+    (error? valor) ambiente
+    (error? (buscar clave ambiente)) (conj (conj ambiente valor) clave)
+    :else (replace {(buscar clave ambiente) valor} ambiente)
+  )
+)
+
+(defn buscar-recursivo [clave lista posicion encontre-clave]
+  (cond
+    (>= posicion (count lista)) (generar-mensaje-error :unbound-variable clave)
+    (= (nth lista posicion) clave) (nth lista (inc posicion))    
+    :else (buscar-recursivo clave lista (inc posicion) false)
+  )
 )
 
 ; user=> (buscar 'c '(a 1 b 2 c 3 d 4 e 5))
 ; 3
 ; user=> (buscar 'f '(a 1 b 2 c 3 d 4 e 5))
 ; (;ERROR: unbound variable: f)
-(defn buscar[]
+(defn buscar [clave lista]
   "Busca una clave en un ambiente (una lista con claves en las posiciones impares [1, 3, 5...] y valores en las pares [2, 4, 6...]
    y devuelve el valor asociado. Devuelve un error :unbound-variable si no la encuentra."
+   (buscar-recursivo clave lista 0 false)
 )
 
 ; user=> (error? (list (symbol ";ERROR:") 'mal 'hecho))
@@ -606,15 +620,55 @@
   )  
 )
 
+(defn reemplazar-en-string [string indice reemplazo]
+  (str (subs string 0 indice) reemplazo (subs string (+ 2 indice)))
+)
+
+(defn es-booleano?[string]
+  (cond
+    (= string "#t") true
+    (= string "#T") true
+    (= string "#f") true
+    (= string "#F") true
+    :else false
+  )
+)
+
+(defn buscar-reemplazo[string]
+  (cond
+    (= string "#t") "%t"
+    (= string "#T") "%T"
+    (= string "#f") "%f"
+    (= string "#F")  "%F"
+    :else string
+  )
+)
+
+(defn recorrer-y-cambiar-string [string posicion]
+  (let [fin-string (+ 2 posicion)
+        nuevo-string  (reemplazar-en-string string posicion (buscar-reemplazo (str (subs string posicion fin-string))))     
+       ]
+      (cond    
+        (>= fin-string (count string)) string
+        (es-booleano? (str (subs string posicion fin-string))) (recorrer-y-cambiar-string nuevo-string (inc posicion))
+        :else (recorrer-y-cambiar-string string (inc posicion))
+      )
+  )
+
+)
+
 ; user=> (proteger-bool-en-str "(or #F #f #t #T)")
 ; "(or %F %f %t %T)"
 ; user=> (proteger-bool-en-str "(and (or #F #f #t #T) #T)")
 ; "(and (or %F %f %t %T) %T)"
 ; user=> (proteger-bool-en-str "")
 ; ""
-(defn proteger-bool-en-str[]
+(defn proteger-bool-en-str [string]
   "Cambia, en una cadena, #t por %t y #f por %f (y sus respectivas versiones en mayusculas), para poder aplicarle read-string."
-
+  (cond
+    (= 0 (count string)) string
+    :else (recorrer-y-cambiar-string string 0)
+  )
 )
 
 ; user=> (restaurar-bool (read-string (proteger-bool-en-str "(and (or #F #f #t #T) #T)")))
