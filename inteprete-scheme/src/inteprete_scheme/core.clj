@@ -767,13 +767,22 @@
 (defn fnc-restar[lista]
   "Resta los elementos de un lista."
   (cond
-    (= (count lista) 0) (generar-mensaje-error :wrong-number-args "-")
+    (= (count lista) 0) (generar-mensaje-error :wrong-number-args-oper "-")
     (not (number? (nth lista 0))) (generar-mensaje-error :wrong-type-arg1 "-" (nth lista 0))
     (= (count lista) 1) (- 0 (nth lista 0))
     :else (restar-recursivo lista (nth lista 0) 1)
   )
 )
 
+
+(defn menor-recursivo[lista posicion-primero posicion-segundo]
+  (cond
+    (<= (count lista) posicion-segundo) (symbol "#t")
+    (not (number? (nth lista posicion-segundo))) (generar-mensaje-error :wrong-type-arg2 "<" (nth lista posicion-segundo))
+    (>= (nth lista posicion-primero) (nth lista posicion-segundo)) (symbol "#f")
+    :else (menor-recursivo lista (inc posicion-primero) (inc posicion-segundo))
+  )
+)
 ; user=> (fnc-menor ())
 ; #t
 ; user=> (fnc-menor '(1))
@@ -794,11 +803,24 @@
 ; (;ERROR: <: Wrong type in arg2 A)
 ; user=> (fnc-menor '(1 2 A 4))
 ; (;ERROR: <: Wrong type in arg2 A)
-(defn fnc-menor[lista-numeros]
+(defn fnc-menor[lista]
   "Devuelve #t si los numeros de una lista estan en orden estrictamente creciente; si no, #f."
-  (apply < lista-numeros)
+    (cond
+    (= (count lista) 0) (symbol "#t")
+    (not (number? (nth lista 0))) (generar-mensaje-error :wrong-type-arg1 "<" (nth lista 0))
+    (= (count lista) 1) (symbol "#t")
+    :else (menor-recursivo lista 0 1)
+  )
 )
 
+(defn mayor-recursivo[lista posicion-primero posicion-segundo]
+  (cond
+    (<= (count lista) posicion-segundo) (symbol "#t")
+    (not (number? (nth lista posicion-segundo))) (generar-mensaje-error :wrong-type-arg2 ">" (nth lista posicion-segundo))
+    (<= (nth lista posicion-primero) (nth lista posicion-segundo)) (symbol "#f")
+    :else (mayor-recursivo lista (inc posicion-primero) (inc posicion-segundo))
+  )
+)
 ; user=> (fnc-mayor ())
 ; #t
 ; user=> (fnc-mayor '(1))
@@ -819,9 +841,23 @@
 ; (;ERROR: >: Wrong type in arg2 A)
 ; user=> (fnc-mayor '(3 2 A 1))
 ; (;ERROR: >: Wrong type in arg2 A)
-(defn fnc-mayor [lista-numeros]
+(defn fnc-mayor [lista]
   "Devuelve #t si los numeros de una lista estan en orden estrictamente decreciente; si no, #f."
-    (apply > lista-numeros)
+  (cond
+    (= (count lista) 0) (symbol "#t")
+    (not (number? (nth lista 0))) (generar-mensaje-error :wrong-type-arg1 ">" (nth lista 0))
+    (= (count lista) 1) (symbol "#t")
+    :else (mayor-recursivo lista 0 1)
+  )
+)
+
+(defn mayor-igual-recursivo[lista posicion-primero posicion-segundo]
+  (cond
+    (<= (count lista) posicion-segundo) (symbol "#t")
+    (not (number? (nth lista posicion-segundo))) (generar-mensaje-error :wrong-type-arg2 ">=" (nth lista posicion-segundo))
+    (< (nth lista posicion-primero) (nth lista posicion-segundo)) (symbol "#f")
+    :else (mayor-recursivo lista (inc posicion-primero) (inc posicion-segundo))
+  )
 )
 
 ; user=> (fnc-mayor-o-igual ())
@@ -844,9 +880,14 @@
 ; (;ERROR: >=: Wrong type in arg2 A)
 ; user=> (fnc-mayor-o-igual '(3 2 A 1))
 ; (;ERROR: >=: Wrong type in arg2 A)
-(defn fnc-mayor-o-igual [lista-numeros]
+(defn fnc-mayor-o-igual [lista]
   "Devuelve #t si los numeros de una lista estan en orden decreciente; si no, #f."
-  (not (fnc-menor lista-numeros))
+    (cond
+    (= (count lista) 0) (symbol "#t")
+    (not (number? (nth lista 0))) (generar-mensaje-error :wrong-type-arg1 ">=" (nth lista 0))
+    (= (count lista) 1) (symbol "#t")
+    :else (mayor-igual-recursivo lista 0 1)
+  )
 )
 
 ; user=> (evaluar-escalar 32 '(x 6 y 11 z "hola"))
