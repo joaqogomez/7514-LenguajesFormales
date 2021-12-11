@@ -14,6 +14,8 @@
         (verificar-parentesis "(hola '(mundo) () 6) 7) 9)")))
     (is (= 0 
         (verificar-parentesis "(hola '(mundo) )")))
+    (is (= 1 
+        (verificar-parentesis "((hola 'mundo")))
   )
 )
 
@@ -79,7 +81,11 @@
 
 (deftest test-fnc-append
   (testing "Testeo la funcion fnc-append"
-    (is (= (1 2 3 4 5 6 7) 
+    (is (= '(1 2 3 4 5 6 7) 
         (fnc-append '( (1 2) (3) (4 5) (6 7)))))
+    (is (;ERROR: append: Wrong type in arg 3)
+        (fnc-append '( (1 2) 3 (4 5) (6 7)))))
+    (is (;ERROR: append: Wrong type in arg A)
+        (fnc-append '( (1 2) A (4 5) (6 7)))))
   ) 
 )

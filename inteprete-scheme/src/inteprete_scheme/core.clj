@@ -549,7 +549,7 @@
 (defn contar-parentesis [lista posicion contador]
   (cond    
     (< contador 0) -1
-    (= posicion (count lista)) contador
+    (= posicion (count lista)) (if (= contador 0) 0 1)
     (= (nth lista posicion) "(") (contar-parentesis lista (inc posicion) (inc contador)) 
     (= (nth lista posicion) ")") (contar-parentesis lista (inc posicion) (dec contador)) 
   )  
@@ -646,8 +646,8 @@
 (defn append-recursivo [lista]
   (cond
     (= (count lista) 1) (nth lista 0)
-    (not (sequential? (nth lista 0))) (type lista)
-    (not (sequential? (nth lista 1))) (type lista) 
+    (not (sequential? (nth lista 0))) (generar-mensaje-error :wrong-type-arg (nth lista 0))   
+    (not (sequential? (nth lista 1))) (generar-mensaje-error :wrong-type-arg (nth lista 1))  
     :else (append-recursivo (concat (list (concat (first lista) (nth lista 1))) (drop 2 lista)))
   )
 )
