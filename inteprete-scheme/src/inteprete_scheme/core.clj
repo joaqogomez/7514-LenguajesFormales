@@ -646,9 +646,9 @@
 (defn append-recursivo [lista]
   (cond
     (= (count lista) 1) (nth lista 0)
-    (not (list? (nth lista 0))) (symbol "#f") 
-    (not (list? (nth lista 1))) (symbol "#f") 
-    :else (append-recursivo (spy(concat (list (concat (first lista) (nth lista 1))) (drop 2 lista))))
+    (not (sequential? (nth lista 0))) (type lista)
+    (not (sequential? (nth lista 1))) (type lista) 
+    :else (append-recursivo (concat (list (concat (first lista) (nth lista 1))) (drop 2 lista)))
   )
 )
 
