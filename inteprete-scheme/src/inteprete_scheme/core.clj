@@ -646,8 +646,8 @@
 (defn append-recursivo [lista]
   (cond
     (= (count lista) 1) (nth lista 0)
-    (not (sequential? (nth lista 0))) (generar-mensaje-error :wrong-type-arg (nth lista 0))   
-    (not (sequential? (nth lista 1))) (generar-mensaje-error :wrong-type-arg (nth lista 1))  
+    (not (sequential? (nth lista 0))) (generar-mensaje-error :wrong-type-arg "append" (nth lista 0))  
+    (not (sequential? (nth lista 1))) (generar-mensaje-error :wrong-type-arg "append" (nth lista 1))  
     :else (append-recursivo (concat (list (concat (first lista) (nth lista 1))) (drop 2 lista)))
   )
 )
@@ -706,6 +706,14 @@
   "Devuelve la lectura de un elemento de Scheme desde la terminal/consola."
 )
 
+(defn sumar-recursivo[lista contador posicion]
+  (cond
+    (<= (count lista) posicion) contador
+    (not (number? (nth lista posicion))) (generar-mensaje-error :wrong-type-arg2 "+" (nth lista posicion))
+    :else (sumar-recursivo lista (+ contador (nth lista posicion)) (inc posicion))
+  )
+)
+
 ; user=> (fnc-sumar ())
 ; 0
 ; user=> (fnc-sumar '(3))
@@ -722,9 +730,22 @@
 ; (;ERROR: +: Wrong type in arg2 A)
 ; user=> (fnc-sumar '(3 4 A 6))
 ; (;ERROR: +: Wrong type in arg2 A)
-(defn fnc-sumar[lista-numeros]
+(defn fnc-sumar[lista]
   "Suma los elementos de una lista."
-  (apply + lista-numeros)
+  (cond
+    (= (count lista) 0) 0
+    (not (number? (nth lista 0))) (generar-mensaje-error :wrong-type-arg1 "+" (nth lista 0))
+    :else (sumar-recursivo lista (nth lista 0) 1)
+  )
+)
+
+
+(defn restar-recursivo[lista contador posicion]
+  (cond
+    (<= (count lista) posicion) contador
+    (not (number? (nth lista posicion))) (generar-mensaje-error :wrong-type-arg2 "-" (nth lista posicion))
+    :else (restar-recursivo lista (- contador (nth lista posicion)) (inc posicion))
+  )
 )
 
 ; user=> (fnc-restar ())
@@ -743,8 +764,14 @@
 ; (;ERROR: -: Wrong type in arg2 A)
 ; user=> (fnc-restar '(3 4 A 6))
 ; (;ERROR: -: Wrong type in arg2 A)
-(defn fnc-restar[]
+(defn fnc-restar[lista]
   "Resta los elementos de un lista."
+  (cond
+    (= (count lista) 0) (generar-mensaje-error :wrong-number-args "-")
+    (not (number? (nth lista 0))) (generar-mensaje-error :wrong-type-arg1 "-" (nth lista 0))
+    (= (count lista) 1) (- 0 (nth lista 0))
+    :else (restar-recursivo lista (nth lista 0) 1)
+  )
 )
 
 ; user=> (fnc-menor ())

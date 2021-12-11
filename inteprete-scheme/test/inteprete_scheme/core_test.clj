@@ -83,9 +83,51 @@
   (testing "Testeo la funcion fnc-append"
     (is (= '(1 2 3 4 5 6 7) 
         (fnc-append '( (1 2) (3) (4 5) (6 7)))))
-    (is (;ERROR: append: Wrong type in arg 3)
-        (fnc-append '( (1 2) 3 (4 5) (6 7)))))
-    (is (;ERROR: append: Wrong type in arg A)
-        (fnc-append '( (1 2) A (4 5) (6 7)))))
+    (is (list (symbol ";ERROR:") (symbol "append:") (symbol "Wrong") (symbol "type") (symbol "in") (symbol "arg") (symbol "3"))
+        (fnc-append '( (1 2) 3 (4 5) (6 7))))
+    (is (list (symbol ";ERROR:") (symbol "append:") (symbol "Wrong") (symbol "type") (symbol "in") (symbol "arg") (symbol "A"))
+        (fnc-append '( (1 2) A (4 5) (6 7))))
+  ) 
+)
+
+(deftest test-fnc-sumar
+  (testing "Testeo la funcion fnc-sumar"
+    (is (= 0
+        (fnc-sumar ())))
+    (is (= 3  
+        (fnc-sumar '(3))))
+    (is (= 7  
+        (fnc-sumar '(3 4))))
+    (is (= 12  
+        (fnc-sumar '(3 4 5))))
+    (is (= 18  
+        (fnc-sumar '(3 4 5 6))))
+    (is (list (symbol ";ERROR:") (symbol "+:") (symbol "Wrong") (symbol "type") (symbol "in") (symbol "arg1") (symbol "A"))  
+        (fnc-sumar '(A 4 5 6)))
+    (is (list (symbol ";ERROR:") (symbol "+:") (symbol "Wrong") (symbol "type") (symbol "in") (symbol "arg2") (symbol "A"))  
+        (fnc-sumar '(3 A 5 6)))
+    (is (list (symbol ";ERROR:") (symbol "+:") (symbol "Wrong") (symbol "type") (symbol "in") (symbol "arg2") (symbol "A"))  
+        (fnc-sumar '(3 4 A 6)))
+  ) 
+)
+
+(deftest test-fnc-restar
+  (testing "Testeo la funcion fnc-restar"
+    (is (= (list (symbol ";ERROR:") (symbol "-:") (symbol "Wrong") (symbol "number") (symbol "of") (symbol "args") (symbol "given"))
+        (fnc-restar ())))
+    (is (= -3  
+        (fnc-restar '(3))))
+    (is (= -1  
+        (fnc-restar '(3 4))))
+    (is (= -6  
+        (fnc-restar '(3 4 5))))
+    (is (= -12  
+        (fnc-restar '(3 4 5 6))))
+    (is (list (symbol ";ERROR:") (symbol "-:") (symbol "Wrong") (symbol "type") (symbol "in") (symbol "arg1") (symbol "A"))  
+        (fnc-restar '(A 4 5 6)))
+    (is (list (symbol ";ERROR:") (symbol "-:") (symbol "Wrong") (symbol "type") (symbol "in") (symbol "arg2") (symbol "A"))  
+        (fnc-restar '(3 A 5 6)))
+    (is (list (symbol ";ERROR:") (symbol "-:") (symbol "Wrong") (symbol "type") (symbol "in") (symbol "arg2") (symbol "A"))  
+        (fnc-restar '(3 4 A 6)))
   ) 
 )
