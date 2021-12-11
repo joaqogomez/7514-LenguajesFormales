@@ -643,14 +643,32 @@
   )
 )
 
+(defn append-recursivo [lista]
+  (cond
+    (= (count lista) 1) (nth lista 0)
+    (not (list? (nth lista 0))) (symbol "#f") 
+    (not (list? (nth lista 1))) (symbol "#f") 
+    :else (append-recursivo (spy(concat (list (concat (first lista) (nth lista 1))) (drop 2 lista))))
+  )
+)
+
 ; user=> (fnc-append '( (1 2) (3) (4 5) (6 7)))
 ; (1 2 3 4 5 6 7)
 ; user=> (fnc-append '( (1 2) 3 (4 5) (6 7)))
 ; (;ERROR: append: Wrong type in arg 3)
 ; user=> (fnc-append '( (1 2) A (4 5) (6 7)))
 ; (;ERROR: append: Wrong type in arg A)
-(defn fnc-append[]
+(defn fnc-append[lista-de-listas]
   "Devuelve el resultado de fusionar listas."
+  (append-recursivo lista-de-listas)
+)
+
+(defn equal-recursivo [lista posicion]
+  (cond 
+    (>= posicion (count lista)) (symbol "#t")    
+    (igual? (first lista) (nth lista posicion)) (equal-recursivo lista (inc posicion))
+    :else (symbol "#f")   
+  )
 )
 
 ; user=> (fnc-equal? ())
@@ -669,9 +687,9 @@
 ; #t
 ; user=> (fnc-equal? '(1 1 2 1))
 ; #f
-(defn fnc-equal?[lista-elementos]
+(defn fnc-equal? [lista]
   "Compara elementos. Si son iguales, devuelve #t. Si no, #f."
-  (apply igual? lista-elementos)
+  (equal-recursivo lista 1)
 )
 
 ; user=> (fnc-read ())

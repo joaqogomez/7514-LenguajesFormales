@@ -48,10 +48,38 @@
     (is (= false 
         (igual? 6 "6")))
     (is (= true 
-    (igual? '(a b C) '(A B C))))
+        (igual? '(a b C) '(A B C))))
     (is (= true 
-    (igual? '((a b) C) '((A B) C))))
+        (igual? '((a b) C) '((A B) C))))
     (is (= true 
-    (igual? '() '())))
+        (igual? '() '())))
+  ) 
+)
+
+(deftest test-fnc-equal?
+  (testing "Testeo la funcion fnc-equal?"
+    (is (= (symbol "#t")   
+        (fnc-equal? ())))
+    (is (= (symbol "#t")   
+        (fnc-equal? '(A))))
+    (is (= (symbol "#t")   
+        (fnc-equal? '(A a))))
+    (is (= (symbol "#t")   
+        (fnc-equal? '(A a A))))
+    (is (= (symbol "#t")   
+        (fnc-equal? '(A a A a))))
+    (is (= (symbol "#f")   
+        (fnc-equal? '(A a A B))))
+    (is (= (symbol "#t")   
+        (fnc-equal? '(1 1 1 1))))
+    (is (= (symbol "#f")   
+        (fnc-equal? '(1 1 2 1))))
+  ) 
+)
+
+(deftest test-fnc-append
+  (testing "Testeo la funcion fnc-append"
+    (is (= (1 2 3 4 5 6 7) 
+        (fnc-append '( (1 2) (3) (4 5) (6 7)))))
   ) 
 )
