@@ -582,9 +582,8 @@
   Si el valor es un error, el ambiente no se modifica. De lo contrario, se le carga o reemplaza la nueva informacion."
   (cond
     (error? valor) ambiente
-    (error? (buscar clave ambiente)) (conj (conj ambiente valor) clave)
-    :else (replace {(buscar clave ambiente) valor} ambiente)
-  )
+    (error?(buscar clave ambiente)) (reverse (into () (conj (conj (into [] ambiente) clave) valor)))
+    :else (replace {(buscar clave ambiente) valor} ambiente))
 )
 
 (defn buscar-recursivo [clave lista posicion encontre-clave]
@@ -614,7 +613,7 @@
 (defn error? [lista]
   "Devuelve true o false, segun sea o no el arg. una lista con `;ERROR:` o `;WARNING:` como primer elemento."
   (cond
-    (not (list? lista)) false
+    (not (sequential? lista)) false
     (= (count lista) 0) false
     :else (or (= (nth lista 0) (symbol ";ERROR:")) (= (nth lista 0) (symbol ";WARNING:")))
   )  
