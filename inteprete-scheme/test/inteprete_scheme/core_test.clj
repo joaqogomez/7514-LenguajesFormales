@@ -246,3 +246,12 @@
         (actualizar-amb '() 'b 7)))
   ) 
 )
+
+(deftest test-leer-entrada
+  (testing "Testeo la funcion leer-entrada"
+    (is (= "(hola mundo)"
+        (with-in-str "(hola\nmundo)" (leer-entrada))))
+    (is (= "123"
+        (with-in-str "123" (leer-entrada))))
+  ) 
+)
