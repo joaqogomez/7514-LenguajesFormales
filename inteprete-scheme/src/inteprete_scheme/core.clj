@@ -1,6 +1,6 @@
 (ns inteprete-scheme.core)
 
-(require '[clojure.string :as st :refer [blank? starts-with? ends-with? lower-case]]
+(require '[clojure.string :as st :refer [blank? starts-with? ends-with? lower-case split]]
          '[clojure.java.io :refer [delete-file reader]]
          '[clojure.walk :refer [postwalk postwalk-replace]])
 
@@ -642,6 +642,10 @@
     (= string "#T") true
     (= string "#f") true
     (= string "#F") true
+    (= string "%t") true
+    (= string "%T") true
+    (= string "%f") true
+    (= string "%F") true
     :else false
   )
 )
@@ -651,7 +655,11 @@
     (= string "#t") "%t"
     (= string "#T") "%T"
     (= string "#f") "%f"
-    (= string "#F")  "%F"
+    (= string "#F") "%F"
+    (= string "%t") "#t"
+    (= string "%T") "#T"
+    (= string "%f") "#f"
+    (= string "%F") "#F"
     :else string
   )
 )
@@ -682,12 +690,36 @@
   )
 )
 
+(defn recorrer-elementos-y-reemplazar [lista posicion]   
+  (cond
+    (>= posicion  (count lista)) lista
+    (sequential? (nth lista posicion)) 
+      (let [
+        reemplazar-elementos-lista (map #(symbol(buscar-reemplazo (str %))) (nth lista posicion))    
+        lista-nueva-con-lista (replace {(nth lista posicion) reemplazar-elementos-lista} lista)
+        ]       
+          (recorrer-elementos-y-reemplazar lista-nueva-con-lista (inc posicion))    
+      )
+    :else
+      (let [
+        reemplazar-elemento-individual (symbol (buscar-reemplazo (str (nth lista posicion))))
+        lista-nueva (replace {(nth lista posicion) reemplazar-elemento-individual} lista)
+        ]
+          (recorrer-elementos-y-reemplazar lista-nueva (inc posicion)) 
+     )
+  )  
+)
+
 ; user=> (restaurar-bool (read-string (proteger-bool-en-str "(and (or #F #f #t #T) #T)")))
 ; (and (or #F #f #t #T) #T)
 ; user=> (restaurar-bool (read-string "(and (or %F %f %t %T) %T)") )
 ; (and (or #F #f #t #T) #T)
-(defn restaurar-bool[]
+(defn restaurar-bool[lista]
   "Cambia, en un codigo leido con read-string, %t por #t y %f por #f (y sus respectivas versiones en mayusculas)."
+  (cond
+    (= 0 (count lista)) lista
+    :else (recorrer-elementos-y-reemplazar lista 0)
+  )  
 )
 
 ; user=> (igual? 'if 'IF)
@@ -767,8 +799,13 @@
 ; (;ERROR: Wrong number of args given #<primitive-procedure read>)
 ; user=> (fnc-read '(1 2 3))
 ; (;ERROR: Wrong number of args given #<primitive-procedure read>)
-(defn fnc-read[]
+(defn fnc-read[lista]
   "Devuelve la lectura de un elemento de Scheme desde la terminal/consola."
+  (cond
+    (= (count lista) 1) (generar-mensaje-error :io-ports-not-implemented "read")
+    (> (count lista) 1) (generar-mensaje-error :wrong-number-args-prim-proc "read")
+    :else (leer-entrada)
+  )
 )
 
 (defn sumar-recursivo[lista contador posicion]
@@ -965,8 +1002,12 @@
 ; ("hola" (x 6 y 11 z "hola"))
 ; user=> (evaluar-escalar 'n '(x 6 y 11 z "hola"))
 ; ((;ERROR: unbound variable: n) (x 6 y 11 z "hola"))
-(defn evaluar-escalar[]
+(defn evaluar-escalar[escalar lista]
   "Evalua una expresion escalar. Devuelve una lista con el resultado y un ambiente."
+  (cond
+    (symbol? escalar) (list (buscar escalar lista) lista)
+    :else (list escalar lista)
+  )
 )
 
 ; user=> (evaluar-define '(define x 2) '(x 1))

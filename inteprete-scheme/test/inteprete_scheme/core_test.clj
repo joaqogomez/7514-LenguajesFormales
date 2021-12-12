@@ -255,3 +255,40 @@
         (with-in-str "123" (leer-entrada))))
   ) 
 )
+
+(deftest test-fnc-read
+  (testing "Testeo la funcion fnc-read"
+    (is (= "(hola mundo)"
+        (with-in-str "(hola\nmundo)" (fnc-read ()))))
+    (is (= (list (symbol ";ERROR:") (symbol "read:") (symbol "Use") (symbol "of")(symbol "I/O")(symbol "ports")(symbol "not")(symbol "implemented"))   
+        (fnc-read '(1))))
+    (is (= (list (symbol ";ERROR:")(symbol "Wrong") (symbol "number") (symbol "of") (symbol "args") (symbol "given")(symbol "#<primitive-procedure")(symbol "read>"))
+        (fnc-read '(1 2))))
+    (is (= (list (symbol ";ERROR:")(symbol "Wrong") (symbol "number") (symbol "of") (symbol "args") (symbol "given")(symbol "#<primitive-procedure")(symbol "read>")) 
+        (fnc-read '(1 2 3))))
+  ) 
+)
+
+(deftest test-evaluar-escalar
+  (testing "Testeo la funcion evaluar-escalar"
+    (is (= '(32 (x 6 y 11 z "hola"))
+        (evaluar-escalar 32 '(x 6 y 11 z "hola"))))
+    (is (= '("chau" (x 6 y 11 z "hola"))
+        (evaluar-escalar "chau" '(x 6 y 11 z "hola"))))
+    (is (= '(11 (x 6 y 11 z "hola"))
+        (evaluar-escalar 'y '(x 6 y 11 z "hola"))))
+    (is (= '("hola" (x 6 y 11 z "hola"))
+        (evaluar-escalar 'z '(x 6 y 11 z "hola"))))
+    (is (= (list (list (symbol ";ERROR:") (symbol "unbound") (symbol "variable:") (symbol "n")) '(x 6 y 11 z "hola")))
+        (evaluar-escalar 'n '(x 6 y 11 z "hola")))
+  ) 
+)
+
+(deftest test-restaurar-bool
+  (testing "Testeo la funcion restaurar-bool"
+    (is (= (list (symbol "and") (list (symbol "or") (symbol "#F") (symbol "#f") (symbol "#t")(symbol "#T")) (symbol "#T"))
+        (restaurar-bool (read-string (proteger-bool-en-str "(and (or #F #f #t #T) #T)")))))
+    (is (= (list (symbol "and") (list (symbol "or") (symbol "#F") (symbol "#f") (symbol "#t")(symbol "#T")) (symbol "#T"))
+        (restaurar-bool (read-string "(and (or %F %f %t %T) %T)"))))
+  ) 
+)
