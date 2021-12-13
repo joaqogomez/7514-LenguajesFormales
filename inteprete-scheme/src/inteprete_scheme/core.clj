@@ -129,7 +129,7 @@
         (igual? (first expre) 'exit) (evaluar-exit expre amb)
         (igual? (first expre) 'load) (evaluar-load expre amb)
         (igual? (first expre) 'set!) (evaluar-set! expre amb)
-        (igual? (first expre) 'quote) (evaluar-qoute expre amb)
+        (igual? (first expre) 'quote) (evaluar-quote expre amb)
         (igual? (first expre) 'lambda) (evaluar-lambda expre amb)
          ;
          ;
@@ -744,6 +744,15 @@
   )  
 )
 
+(defn verificar-elementos-individuales [una-lista otra-lista posicion]
+  (cond
+    (not (= (count una-lista) (count otra-lista))) false
+    (>= posicion  (count una-lista)) true
+    (igual? (nth una-lista posicion) (nth otra-lista posicion)) (verificar-elementos-individuales una-lista otra-lista (inc posicion))
+    :else false
+  )
+)
+
 ; user=> (igual? 'if 'IF)
 ; true
 ; user=> (igual? 'if 'if)
@@ -757,6 +766,7 @@
 (defn igual?[un-elemento otro-elemento]
   "Verifica la igualdad entre dos elementos al estilo de Scheme (case-insensitive)"
   (cond
+    (and (sequential? un-elemento) (sequential? otro-elemento)) (verificar-elementos-individuales un-elemento otro-elemento 0)
     (not (= (type un-elemento) (type otro-elemento))) false
     :else (= (st/lower-case (str un-elemento)) (st/lower-case(str otro-elemento)))
   )
@@ -1052,6 +1062,13 @@
   "Evalua una expresion `define`. Devuelve una lista con el resultado y un ambiente actualizado con la definicion."
 )
 
+(defn evaluar-condicion [condicion]
+  (cond
+    (es-booleano? (str condicion)) (or (= (symbol "#t") condicion) (= (symbol "#T") condicion))
+    :else condicion
+  )
+)
+
 ; user=> (evaluar-if '(if 1 2) '(n 7))
 ; (2 (n 7))
 ; user=> (evaluar-if '(if 1 n) '(n 7))
@@ -1073,7 +1090,17 @@
   (cond
     (< (count lista) 3) (list (generar-mensaje-error :missing-or-extra "if" lista) ambiente)
     (> (count lista) 4) (list (generar-mensaje-error :missing-or-extra "if" lista) ambiente)
-    :else 
+    :else
+    (let [
+        condicion (nth lista 1)
+        hacer-si-verdadero (nth lista 2)
+        hacer-si-falso (if (= (count lista) 4) (nth lista 3) (symbol "#<unspecified>"))
+        evaluar-verdadero (evaluar hacer-si-verdadero ambiente)
+        evaluar-falso (if (= hacer-si-falso (symbol "#<unspecified>")) (list (symbol "#<unspecified>") ambiente) (evaluar hacer-si-falso ambiente) )         
+        condicion-if (evaluar-condicion condicion)         
+        ]
+        (if condicion-if evaluar-verdadero evaluar-falso)
+     )
   )
 )
 

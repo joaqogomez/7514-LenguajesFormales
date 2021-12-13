@@ -55,6 +55,8 @@
         (igual? '((a b) C) '((A B) C))))
     (is (= true 
         (igual? '() '())))
+    (is (= true 
+        (igual? '([a b] C) '((A B) C))))
   ) 
 )
 
@@ -301,16 +303,18 @@
         (evaluar-if '(if 1 n) '(n 7))))
     (is (= '(7 (n 7))
         (evaluar-if '(if 1 n 8) '(n 7))))
-    (is (= (list (symbol "#<unspecified>") '(n 7 (symbol "#f") (symbol "#f")))
+    (is (= (list (symbol "#<unspecified>") (list 'n 7 (symbol "#f") (symbol "#f")))
         (evaluar-if (list 'if (symbol "#f") 'n) (list 'n 7 (symbol "#f") (symbol "#f")))))
-    (is (= (list 8 '(n 7 (symbol "#f") (symbol "#f")))
+    (is (= (list 8 (list 'n 7 (symbol "#f") (symbol "#f")))
         (evaluar-if (list 'if (symbol "#f") 'n 8) (list 'n 7 (symbol "#f") (symbol "#f")))))
-    (is (= (list (symbol "#<unspecified>") '(n 9 (symbol "#f") (symbol "#f")))
+    (is (= (list (symbol "#<unspecified>") (list 'n 9 (symbol "#f") (symbol "#f")))
         (evaluar-if (list 'if (symbol "#f") 'n '(set! n 9)) (list 'n 7 (symbol "#f") (symbol "#f")))))
     (is (= (list (list (symbol ";ERROR:") (symbol "if:") (symbol "missing") (symbol "or")(symbol "extra") (symbol "expression") '(if)) '(n 7))
         (evaluar-if '(if) '(n 7))))
     (is (= (list (list (symbol ";ERROR:") (symbol "if:") (symbol "missing") (symbol "or")(symbol "extra") (symbol "expression") '(if 1)) '(n 7))
         (evaluar-if '(if 1) '(n 7))))
+    (is (= (list (list (symbol ";ERROR:") (symbol "if:") (symbol "missing") (symbol "or")(symbol "extra") (symbol "expression") '(if 1 2 3 4)) '(n 7))
+        (evaluar-if '(if 1 2 3 4) '(n 7))))
   ) 
 )
 
