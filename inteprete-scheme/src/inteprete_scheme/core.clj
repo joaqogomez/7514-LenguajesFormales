@@ -1130,7 +1130,19 @@
 ; ((;ERROR: set!: bad variable 1) (x 0))
 (defn evaluar-set![lista ambiente]
   "Evalua una expresion `set!`. Devuelve una lista con el resultado y un ambiente actualizado con la redefinicion."
+  (let [   
+           cantidad-parametros-necesarios (= (count lista) 3)
+           clave (if cantidad-parametros-necesarios (nth lista 1))
+           valor (if cantidad-parametros-necesarios (nth lista 2))
+           buscar-en-ambiente (buscar clave ambiente)
+    ]
+    (cond    
+      (not cantidad-parametros-necesarios) (list (generar-mensaje-error :missing-or-extra "set!" lista) ambiente)
+      (number? clave) (list (generar-mensaje-error :bad-variable "set!" clave) ambiente)
+      (error? buscar-en-ambiente) (list buscar-en-ambiente ambiente)
+      :else (list (symbol "#<unspecified>") (actualizar-amb ambiente clave valor))      
+    )
+  )
 )
-
 
 ; Al terminar de cargar el archivo en el REPL de Clojure, se debe devolver true.

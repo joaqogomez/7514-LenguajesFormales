@@ -333,9 +333,17 @@
   ;) 
 ;)
 
-;(deftest test-evaluar-set!
- ; (testing "Testeo la funcion evaluar-set!"
-  ;  (is (= '(32 (x 6 y 11 z "hola"))
-   ;     (evaluar-escalar 32 '(x 6 y 11 z "hola"))))
-  ;) 
-;)
+(deftest test-evaluar-set!
+  (testing "Testeo la funcion evaluar-set!"
+    (is (= (list (symbol "#<unspecified>") (list 'x 1 ))
+        (evaluar-set! '(set! x 1) '(x 0))))
+    (is (= (list (list (symbol ";ERROR:") (symbol "unbound") (symbol "variable:") (symbol "x")) '()))
+        (evaluar-set! '(set! x 1) '()))
+    (is (= (list (list (symbol ";ERROR:") (symbol "set!:") (symbol "missing") (symbol "or")(symbol "extra") (symbol "expression") '(set! x) '(x 0))
+        (evaluar-if '(set! x) '(x 0)))))
+    (is (= (list (list (symbol ";ERROR:") (symbol "set!:") (symbol "missing") (symbol "or")(symbol "extra") (symbol "expression") '(set! x 1 2) '(x 0))
+        (evaluar-if '(set! x 1 2) '(x 0)))))
+    (is (= (list (list (symbol ";ERROR:") (symbol "set!:") (symbol "bad") (symbol "variable")(symbol "1") '(x 0))
+        (evaluar-if '(set! x 1 2) '(x 0)))))
+  ) 
+)
