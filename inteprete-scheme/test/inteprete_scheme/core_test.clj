@@ -292,3 +292,46 @@
         (restaurar-bool (read-string "(and (or %F %f %t %T) %T)"))))
   ) 
 )
+
+(deftest test-evaluar-if
+  (testing "Testeo la funcion evaluar-if"
+    (is (= '(2 (n 7))
+        (evaluar-if '(if 1 2) '(n 7))))
+    (is (= '(7 (n 7))
+        (evaluar-if '(if 1 n) '(n 7))))
+    (is (= '(7 (n 7))
+        (evaluar-if '(if 1 n 8) '(n 7))))
+    (is (= (list (symbol "#<unspecified>") '(n 7 (symbol "#f") (symbol "#f")))
+        (evaluar-if (list 'if (symbol "#f") 'n) (list 'n 7 (symbol "#f") (symbol "#f")))))
+    (is (= (list 8 '(n 7 (symbol "#f") (symbol "#f")))
+        (evaluar-if (list 'if (symbol "#f") 'n 8) (list 'n 7 (symbol "#f") (symbol "#f")))))
+    (is (= (list (symbol "#<unspecified>") '(n 9 (symbol "#f") (symbol "#f")))
+        (evaluar-if (list 'if (symbol "#f") 'n '(set! n 9)) (list 'n 7 (symbol "#f") (symbol "#f")))))
+    (is (= (list (list (symbol ";ERROR:") (symbol "if:") (symbol "missing") (symbol "or")(symbol "extra") (symbol "expression") '(if)) '(n 7))
+        (evaluar-if '(if) '(n 7))))
+    (is (= (list (list (symbol ";ERROR:") (symbol "if:") (symbol "missing") (symbol "or")(symbol "extra") (symbol "expression") '(if 1)) '(n 7))
+        (evaluar-if '(if 1) '(n 7))))
+  ) 
+)
+
+
+;(deftest test-evaluar-define
+ ; (testing "Testeo la funcion evaluar-define"
+  ;  (is (= '(32 (x 6 y 11 z "hola"))
+   ;     (evaluar-escalar 32 '(x 6 y 11 z "hola"))))
+  ;) 
+;)
+
+;(deftest test-evaluar-or
+ ; (testing "Testeo la funcion evaluar-or"
+  ;  (is (= '(32 (x 6 y 11 z "hola"))
+   ;     (evaluar-escalar 32 '(x 6 y 11 z "hola"))))
+  ;) 
+;)
+
+;(deftest test-evaluar-set!
+ ; (testing "Testeo la funcion evaluar-set!"
+  ;  (is (= '(32 (x 6 y 11 z "hola"))
+   ;     (evaluar-escalar 32 '(x 6 y 11 z "hola"))))
+  ;) 
+;)

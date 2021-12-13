@@ -122,9 +122,15 @@
       (list expre amb)                                      ; de lo contrario, evaluarla
       (cond
         (not (seq? expre))             (evaluar-escalar expre amb)
-
         (igual? (first expre) 'define) (evaluar-define expre amb)
-
+        (igual? (first expre) 'if) (evaluar-if expre amb)
+        (igual? (first expre) 'cond) (evaluar-cond expre amb)
+        (igual? (first expre) 'eval) (evaluar-eval expre amb)
+        (igual? (first expre) 'exit) (evaluar-exit expre amb)
+        (igual? (first expre) 'load) (evaluar-load expre amb)
+        (igual? (first expre) 'set!) (evaluar-set! expre amb)
+        (igual? (first expre) 'quote) (evaluar-qoute expre amb)
+        (igual? (first expre) 'lambda) (evaluar-lambda expre amb)
          ;
          ;
          ;
@@ -188,7 +194,10 @@
   [fnc lae amb]
   (cond
     (= fnc '<)            (fnc-menor lae)
-
+    (= fnc '+)            (fnc-sumar lae)
+    (= fnc '-)            (fnc-restar lae)
+    (= fnc '>)            (fnc-mayor lae)
+    (= fnc '>=)            (fnc-mayor-o-igual lae)
     ;
     ;
     ; Si la funcion primitiva esta identificada por un simbolo, puede determinarse mas rapido que hacer con ella
@@ -197,7 +206,20 @@
 
 
     (igual? fnc 'append)  (fnc-append lae)
-
+    (igual? fnc 'car)  (fnc-car lae)
+    (igual? fnc 'cdr)  (fnc-cdr lae)
+    (igual? fnc 'env)  (fnc-env lae)
+    (igual? fnc 'not)  (fnc-not lae)
+    (igual? fnc 'cons)  (fnc-cons lae)
+    (igual? fnc 'list)  (fnc-list lae)
+    (igual? fnc 'list?)  (fnc-list? lae)
+    (igual? fnc 'read)  (fnc-read lae)
+    (igual? fnc 'null?)  (fnc-null? lae)
+    (igual? fnc 'equal?)  (fnc-equal? lae)
+    (igual? fnc 'length)  (fnc-length lae)
+    (igual? fnc 'display)  (fnc-display lae)
+    (igual? fnc 'newline)  (fnc-newline lae)
+    (igual? fnc 'reverse)  (fnc-reverse lae)
     ;
     ;
     ; Si la funcion primitiva esta identificada mediante una palabra reservada, debe ignorarse la distincion entre mayusculas y minusculas 
@@ -1026,7 +1048,7 @@
 ; ((;ERROR: define: bad variable (define () 2)) (x 1))
 ; user=> (evaluar-define '(define 2 x) '(x 1))
 ; ((;ERROR: define: bad variable (define 2 x)) (x 1))
-(defn evaluar-define[]
+(defn evaluar-define[lista ambiente]
   "Evalua una expresion `define`. Devuelve una lista con el resultado y un ambiente actualizado con la definicion."
 )
 
@@ -1046,8 +1068,13 @@
 ; ((;ERROR: if: missing or extra expression (if)) (n 7))
 ; user=> (evaluar-if '(if 1) '(n 7))
 ; ((;ERROR: if: missing or extra expression (if 1)) (n 7))
-(defn evaluar-if[]
+(defn evaluar-if[lista ambiente]
   "Evalua una expresion `if`. Devuelve una lista con el resultado y un ambiente eventualmente modificado."
+  (cond
+    (< (count lista) 3) (list (generar-mensaje-error :missing-or-extra "if" lista) ambiente)
+    (> (count lista) 4) (list (generar-mensaje-error :missing-or-extra "if" lista) ambiente)
+    :else 
+  )
 )
 
 ; user=> (evaluar-or (list 'or) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))
@@ -1060,7 +1087,7 @@
 ; (5 (#f #f #t #t))
 ; user=> (evaluar-or (list 'or (symbol "#f")) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))
 ; (#f (#f #f #t #t))
-(defn evaluar-or[]
+(defn evaluar-or[lista ambiente]
   "Evalua una expresion `or`.  Devuelve una lista con el resultado y un ambiente."
 )
 
@@ -1074,7 +1101,7 @@
 ; ((;ERROR: set!: missing or extra expression (set! x 1 2)) (x 0))
 ; user=> (evaluar-set! '(set! 1 2) '(x 0))
 ; ((;ERROR: set!: bad variable 1) (x 0))
-(defn evaluar-set![]
+(defn evaluar-set![lista ambiente]
   "Evalua una expresion `set!`. Devuelve una lista con el resultado y un ambiente actualizado con la redefinicion."
 )
 
