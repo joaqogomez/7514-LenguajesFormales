@@ -77,6 +77,11 @@
 (declare evaluar-secuencia-en-cond)
 
 
+(defn -main
+  [& args]
+  (repl)
+)
+
 ; REPL (read–eval–print loop).
 ; Aridad 0: Muestra mensaje de bienvenida y se llama recursivamente con el ambiente inicial.
 ; Aridad 1: Muestra > y lee una expresion y la evalua. El resultado es una lista con un valor y un ambiente. 
