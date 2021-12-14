@@ -323,8 +323,8 @@
   (testing "Testeo la funcion evaluar-define"
     (is (= (list (symbol "#<unspecified>") (list 'x 2 ))
         (evaluar-define '(define x 2) '(x 1))))
-    (is (= (list (list (symbol "#<unspecified>") (list 'x 1 'f '(lambda (x) (+ x 1)))))
-        (evaluar-define '(define (f x) (+ x 1)) '(x 1))))
+    (is (= (list (symbol "#<unspecified>") (list 'x 1 'f '(lambda (x) (+ x 1))))
+         (evaluar-define '(define (f x) (+ x 1)) '(x 1))))
     (is (= (list (list (symbol ";ERROR:") (symbol "define:") (symbol "missing") (symbol "or")(symbol "extra") (symbol "expression") '(define)) '(x 1))
         (evaluar-define '(define) '(x 1))))
     (is (= (list (list (symbol ";ERROR:") (symbol "define:") (symbol "missing") (symbol "or")(symbol "extra") (symbol "expression") '(define x)) '(x 1))
