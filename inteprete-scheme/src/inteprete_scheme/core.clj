@@ -1042,6 +1042,24 @@
   )
 )
 
+
+(defn generar-funcion-lambda[lista ambiente]  
+  (let [             
+          clave (nth lista 1)
+          valor (nth lista 2)
+          cantidad-parametros-necesarios (>= (count clave) 2)
+          nombre-funcion (if cantidad-parametros-necesarios (nth clave 0) '())
+          parametros-funcion (if cantidad-parametros-necesarios (rest clave))
+          funcion-lambda (list (symbol "lambda") parametros-funcion valor)
+    ]
+    (cond
+      (or (number? nombre-funcion) (sequential? nombre-funcion)) (list (generar-mensaje-error :bad-variable "define" lista) ambiente)    
+      (not cantidad-parametros-necesarios) (list (generar-mensaje-error :missing-or-extra "define" lista) ambiente)      
+      :else (list (symbol "#<unspecified>") (actualizar-amb ambiente nombre-funcion funcion-lambda))      
+    )
+  )
+)
+
 ; user=> (evaluar-define '(define x 2) '(x 1))
 ; (#<unspecified> (x 2))
 ; user=> (evaluar-define '(define (f x) (+ x 1)) '(x 1))
@@ -1067,7 +1085,8 @@
     ]
     (cond    
       (not cantidad-parametros-necesarios) (list (generar-mensaje-error :missing-or-extra "define" lista) ambiente)
-      (or (number? clave) (sequential? clave)) (list (generar-mensaje-error :bad-variable "define" lista) ambiente)
+      (number? clave) (list (generar-mensaje-error :bad-variable "define" lista) ambiente)
+      (sequential? clave) (generar-funcion-lambda lista ambiente)
       :else (list (symbol "#<unspecified>") (actualizar-amb ambiente clave valor))      
     )
   )
