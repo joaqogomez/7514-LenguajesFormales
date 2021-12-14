@@ -1060,11 +1060,26 @@
 ; ((;ERROR: define: bad variable (define 2 x)) (x 1))
 (defn evaluar-define[lista ambiente]
   "Evalua una expresion `define`. Devuelve una lista con el resultado y un ambiente actualizado con la definicion."
+  (let [   
+           cantidad-parametros-necesarios (= (count lista) 3)
+           clave (if cantidad-parametros-necesarios (nth lista 1))
+           valor (if cantidad-parametros-necesarios (nth lista 2))
+    ]
+    (cond    
+      (not cantidad-parametros-necesarios) (list (generar-mensaje-error :missing-or-extra "define" lista) ambiente)
+      (or (number? clave) (sequential? clave)) (list (generar-mensaje-error :bad-variable "define" lista) ambiente)
+      :else (list (symbol "#<unspecified>") (actualizar-amb ambiente clave valor))      
+    )
+  )
+)
+
+(defn es-verdadero [un-booleano]
+  (or (= (symbol "#t") un-booleano) (= (symbol "#T") un-booleano))
 )
 
 (defn evaluar-condicion [condicion]
   (cond
-    (es-booleano? (str condicion)) (or (= (symbol "#t") condicion) (= (symbol "#T") condicion))
+    (es-booleano? (str condicion)) (es-verdadero condicion)
     :else condicion
   )
 )
@@ -1104,6 +1119,19 @@
   )
 )
 
+(defn recorrer-y-evaluar [lista ambiente posicion]
+  (let [ termine-de-recorrer (<= (count lista) posicion)
+    elemento-en-posicion (if (not termine-de-recorrer) (nth lista posicion))
+  ]
+    (cond
+      termine-de-recorrer (symbol "#f")      
+      (es-booleano? (str elemento-en-posicion)) (if (es-verdadero elemento-en-posicion) elemento-en-posicion (recorrer-y-evaluar lista ambiente (inc posicion)))
+      (evaluar elemento-en-posicion ambiente) elemento-en-posicion
+      :else (recorrer-y-evaluar lista ambiente (inc posicion))
+    )
+  )
+)
+
 ; user=> (evaluar-or (list 'or) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))
 ; (#f (#f #f #t #t))
 ; user=> (evaluar-or (list 'or (symbol "#t")) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))
@@ -1116,6 +1144,10 @@
 ; (#f (#f #f #t #t))
 (defn evaluar-or[lista ambiente]
   "Evalua una expresion `or`.  Devuelve una lista con el resultado y un ambiente."
+    (cond
+      (= (count lista) 1) (list (symbol "#f") ambiente)
+      :else (list (recorrer-y-evaluar lista ambiente 1) ambiente)
+    )
 )
 
 ; user=> (evaluar-set! '(set! x 1) '(x 0))
@@ -1138,7 +1170,7 @@
     ]
     (cond    
       (not cantidad-parametros-necesarios) (list (generar-mensaje-error :missing-or-extra "set!" lista) ambiente)
-      (number? clave) (list (generar-mensaje-error :bad-variable "set!" clave) ambiente)
+      (or (number? clave) (sequential? clave)) (list (generar-mensaje-error :bad-variable "set!" clave) ambiente)
       (error? buscar-en-ambiente) (list buscar-en-ambiente ambiente)
       :else (list (symbol "#<unspecified>") (actualizar-amb ambiente clave valor))      
     )

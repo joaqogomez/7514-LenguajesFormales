@@ -319,31 +319,55 @@
 )
 
 
-;(deftest test-evaluar-define
- ; (testing "Testeo la funcion evaluar-define"
-  ;  (is (= '(32 (x 6 y 11 z "hola"))
-   ;     (evaluar-escalar 32 '(x 6 y 11 z "hola"))))
-  ;) 
-;)
+(deftest test-evaluar-define
+  (testing "Testeo la funcion evaluar-define"
+    (is (= (list (symbol "#<unspecified>") (list 'x 2 ))
+        (evaluar-define '(define x 2) '(x 1))))
+    (is (= (list (list (symbol "#<unspecified>") (list 'x 1 'f '(lambda (x) (+ x 1)))))
+        (evaluar-define '(define (f x) (+ x 1)) '(x 1))))
+    (is (= (list (list (symbol ";ERROR:") (symbol "define:") (symbol "missing") (symbol "or")(symbol "extra") (symbol "expression") '(define)) '(x 1))
+        (evaluar-define '(define) '(x 1))))
+    (is (= (list (list (symbol ";ERROR:") (symbol "define:") (symbol "missing") (symbol "or")(symbol "extra") (symbol "expression") '(define x)) '(x 1))
+        (evaluar-define '(define x) '(x 1))))
+    (is (= (list (list (symbol ";ERROR:") (symbol "define:") (symbol "missing") (symbol "or")(symbol "extra") (symbol "expression") '(define x 2 3)) '(x 1))
+        (evaluar-define '(define x 2 3) '(x 1))))
+    (is (= (list (list (symbol ";ERROR:") (symbol "define:") (symbol "missing") (symbol "or")(symbol "extra") (symbol "expression") '(define ())) '(x 1))
+        (evaluar-define '(define ()) '(x 1))))
+    (is (= (list (list (symbol ";ERROR:") (symbol "define:") (symbol "bad") (symbol "variable") '(define () 2)) '(x 1))
+        (evaluar-define '(define () 2) '(x 1))))
+    (is (= (list (list (symbol ";ERROR:") (symbol "define:") (symbol "bad") (symbol "variable")'(define 2 x)) '(x 1))
+        (evaluar-define '(define 2 x) '(x 1))))
+  ) 
+)
 
-;(deftest test-evaluar-or
- ; (testing "Testeo la funcion evaluar-or"
-  ;  (is (= '(32 (x 6 y 11 z "hola"))
-   ;     (evaluar-escalar 32 '(x 6 y 11 z "hola"))))
-  ;) 
-;)
+(deftest test-evaluar-or
+  (testing "Testeo la funcion evaluar-set!"
+    (is (= (list (symbol "#f") (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))
+        (evaluar-or (list 'or) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))))
+    (is (= (list (symbol "#t") (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))
+        (evaluar-or (list 'or (symbol "#t")) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))))
+    (is (= (list 7 (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))
+        (evaluar-or (list 'or 7) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))))
+    (is (= (list 5 (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))
+        (evaluar-or (list 'or (symbol "#f") 5) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))))
+    (is (= (list (symbol "#f") (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))
+        (evaluar-or (list 'or (symbol "#f")) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))))
+  ) 
+)
 
 (deftest test-evaluar-set!
   (testing "Testeo la funcion evaluar-set!"
     (is (= (list (symbol "#<unspecified>") (list 'x 1 ))
         (evaluar-set! '(set! x 1) '(x 0))))
-    (is (= (list (list (symbol ";ERROR:") (symbol "unbound") (symbol "variable:") (symbol "x")) '()))
-        (evaluar-set! '(set! x 1) '()))
-    (is (= (list (list (symbol ";ERROR:") (symbol "set!:") (symbol "missing") (symbol "or")(symbol "extra") (symbol "expression") '(set! x) '(x 0))
-        (evaluar-if '(set! x) '(x 0)))))
-    (is (= (list (list (symbol ";ERROR:") (symbol "set!:") (symbol "missing") (symbol "or")(symbol "extra") (symbol "expression") '(set! x 1 2) '(x 0))
-        (evaluar-if '(set! x 1 2) '(x 0)))))
-    (is (= (list (list (symbol ";ERROR:") (symbol "set!:") (symbol "bad") (symbol "variable")(symbol "1") '(x 0))
-        (evaluar-if '(set! x 1 2) '(x 0)))))
+    (is (= (list (list (symbol ";ERROR:") (symbol "unbound") (symbol "variable:") (symbol "x")) '())
+        (evaluar-set! '(set! x 1) '())))
+    (is (= (list (list (symbol ";ERROR:") (symbol "set!:") (symbol "missing") (symbol "or")(symbol "extra") (symbol "expression") '(set! x)) '(x 0))
+        (evaluar-set! '(set! x) '(x 0))))
+    (is (= (list (list (symbol ";ERROR:") (symbol "set!:") (symbol "missing") (symbol "or")(symbol "extra")) (symbol "expression") '(set! x 1 2) '(x 0)))
+        (evaluar-set! '(set! x 1 2) '(x 0)))
+    (is (= (list (list (symbol ";ERROR:") (symbol "set!:") (symbol "bad") (symbol "variable")(symbol "1")) '(x 0)))
+        (evaluar-set! '(set! 1 2) '(x 0)))
+    (is (= (list (list (symbol ";ERROR:") (symbol "set!:") (symbol "bad") (symbol "variable")(symbol "()")) '(x 0)))
+        (evaluar-set! '(set! () 2) '(x 0)))
   ) 
 )
