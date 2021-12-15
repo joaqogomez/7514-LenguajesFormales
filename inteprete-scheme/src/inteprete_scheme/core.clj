@@ -123,6 +123,11 @@
 (defn evaluar
   "Evalua una expresion `expre` en un ambiente. Devuelve un lista con un valor resultante y un ambiente."
   [expre amb]
+  ;(let [
+   ;   valexpre (spy "EXPRE \n" expre)
+    ;valamb (spy "EXPRE \n" amb)
+  ;]
+  ;)
   (if (and (seq? expre) (or (empty? expre) (error? expre))) ; si `expre` es () o error, devolverla intacta
       (list expre amb)                                      ; de lo contrario, evaluarla
       (cond
@@ -1063,12 +1068,11 @@
 (defn generar-funcion-lambda[lista ambiente]  
   (let [             
           clave (nth lista 1)
-          valor (nth lista 2)
+          valor (rest (rest lista))
           cantidad-parametros-necesarios (>= (count clave) 2)
           nombre-funcion (if cantidad-parametros-necesarios (nth clave 0) '())
           parametros-funcion (if cantidad-parametros-necesarios (rest clave))
           funcion-lambda (list (symbol "lambda") parametros-funcion valor)
-          ambiente2 ambiente
     ]
     (cond
       (or (number? nombre-funcion) (sequential? nombre-funcion)) (list (generar-mensaje-error :bad-variable "define" lista) ambiente)    
@@ -1209,7 +1213,7 @@
       (not cantidad-parametros-necesarios) (list (generar-mensaje-error :missing-or-extra "set!" lista) ambiente)
       (or (number? clave) (sequential? clave)) (list (generar-mensaje-error :bad-variable "set!" clave) ambiente)
       (error? buscar-en-ambiente) (list buscar-en-ambiente ambiente)
-      :else (list (symbol "#<unspecified>") (actualizar-amb ambiente clave valor))      
+      :else (list (symbol "#<unspecified>") (actualizar-amb ambiente clave (evaluar valor ambiente)))      
     )
   )
 )
