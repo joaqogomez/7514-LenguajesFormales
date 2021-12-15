@@ -968,7 +968,7 @@
   (cond
     (<= (count lista) posicion-segundo) (symbol "#t")
     (not (number? (nth lista posicion-segundo))) (generar-mensaje-error :wrong-type-arg2 ">" (nth lista posicion-segundo))
-    (<= (nth lista posicion-primero) (nth lista posicion-segundo)) (symbol "#f")
+    (< (nth lista posicion-primero) (nth lista posicion-segundo)) (symbol "#f")
     :else (recur lista (inc posicion-primero) (inc posicion-segundo))
   )
 )
