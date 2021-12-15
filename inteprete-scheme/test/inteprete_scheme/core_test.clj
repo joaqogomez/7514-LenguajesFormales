@@ -200,7 +200,7 @@
         (fnc-mayor-o-igual '(3 2 1))))
     (is (= (symbol "#t")  
         (fnc-mayor-o-igual '(4 3 2 1))))
-    (is (= (symbol "#f")  
+    (is (= (symbol "#t")  
         (fnc-mayor-o-igual '(4 2 2 1))))
     (is (= (symbol "#f")  
         (fnc-mayor-o-igual '(4 2 1 4))))
