@@ -1069,10 +1069,11 @@
   (let [             
           clave (nth lista 1)
           valor (rest (rest lista))
+          valores-funcion (if (= (count valor) 1) (nth valor 0) valor)
           cantidad-parametros-necesarios (>= (count clave) 2)
           nombre-funcion (if cantidad-parametros-necesarios (nth clave 0) '())
           parametros-funcion (if cantidad-parametros-necesarios (rest clave))
-          funcion-lambda (list (symbol "lambda") parametros-funcion valor)
+          funcion-lambda (list (symbol "lambda") parametros-funcion valores-funcion)
     ]
     (cond
       (or (number? nombre-funcion) (sequential? nombre-funcion)) (list (generar-mensaje-error :bad-variable "define" lista) ambiente)    
@@ -1207,13 +1208,13 @@
            cantidad-parametros-necesarios (= (count lista) 3)
            clave (if cantidad-parametros-necesarios (nth lista 1))
            valor (if cantidad-parametros-necesarios (nth lista 2))
-           buscar-en-ambiente (buscar clave ambiente)
+           buscar-en-ambiente (buscar clave ambiente)           
     ]
     (cond    
       (not cantidad-parametros-necesarios) (list (generar-mensaje-error :missing-or-extra "set!" lista) ambiente)
       (or (number? clave) (sequential? clave)) (list (generar-mensaje-error :bad-variable "set!" clave) ambiente)
       (error? buscar-en-ambiente) (list buscar-en-ambiente ambiente)
-      :else (list (symbol "#<unspecified>") (actualizar-amb ambiente clave (evaluar valor ambiente)))      
+      :else (list (symbol "#<unspecified>") (actualizar-amb ambiente clave (first(evaluar valor ambiente))))      
     )
   )
 )
