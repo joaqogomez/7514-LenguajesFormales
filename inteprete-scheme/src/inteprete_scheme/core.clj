@@ -566,7 +566,7 @@
   (let [ entrada (read-line)          
        ]
       (cond    
-        (> (verificar-parentesis (str string entrada)) 0) (leer-entrada-recursivo (str string (str entrada " ")))
+        (> (verificar-parentesis (str string entrada)) 0) (recur (str string (str entrada " ")))
         (< (verificar-parentesis (str string entrada)) 0) ((str string entrada) (generar-mensaje-error :warning-paren))
         :else (str string entrada)
       )
@@ -592,8 +592,8 @@
   (cond    
     (< contador 0) -1
     (= posicion (count lista)) (if (= contador 0) 0 1)
-    (= (nth lista posicion) "(") (contar-parentesis lista (inc posicion) (inc contador)) 
-    (= (nth lista posicion) ")") (contar-parentesis lista (inc posicion) (dec contador)) 
+    (= (nth lista posicion) "(") (recur lista (inc posicion) (inc contador)) 
+    (= (nth lista posicion) ")") (recur lista (inc posicion) (dec contador)) 
   )  
 )
 ; user=> (verificar-parentesis "(hola 'mundo")
@@ -631,8 +631,8 @@
 (defn buscar-recursivo [clave lista posicion encontre-clave]
   (cond
     (>= posicion (count lista)) (generar-mensaje-error :unbound-variable clave)
-    (= (nth lista posicion) clave) (nth lista (inc posicion))    
-    :else (buscar-recursivo clave lista (inc posicion) false)
+    (igual? (nth lista posicion) clave) (nth lista (inc posicion))    
+    :else (recur clave lista (inc posicion) false)
   )
 )
 
@@ -699,8 +699,8 @@
        ]
       (cond    
         (>= fin-string (count string)) string
-        (es-booleano? (str (subs string posicion fin-string))) (recorrer-y-cambiar-string nuevo-string (inc posicion))
-        :else (recorrer-y-cambiar-string string (inc posicion))
+        (es-booleano? (str (subs string posicion fin-string))) (recur nuevo-string (inc posicion))
+        :else (recur string (inc posicion))
       )
   )
 )
@@ -737,14 +737,14 @@
         reemplazar-elementos-lista (map #(buscar-reemplazo-symbol %) (nth lista posicion))    
         lista-nueva-con-lista (replace {(nth lista posicion) reemplazar-elementos-lista} lista)
         ]       
-          (recorrer-elementos-y-reemplazar lista-nueva-con-lista (inc posicion))    
+          (recur lista-nueva-con-lista (inc posicion))    
       )
     :else
       (let [
         reemplazar-elemento-individual  (buscar-reemplazo-symbol (nth lista posicion))
         lista-nueva (replace {(nth lista posicion) reemplazar-elemento-individual} lista)
         ]
-          (recorrer-elementos-y-reemplazar lista-nueva (inc posicion)) 
+          (recur lista-nueva (inc posicion)) 
      )
   )  
 )
@@ -765,7 +765,7 @@
   (cond
     (not (= (count una-lista) (count otra-lista))) false
     (>= posicion  (count una-lista)) true
-    (igual? (nth una-lista posicion) (nth otra-lista posicion)) (verificar-elementos-individuales una-lista otra-lista (inc posicion))
+    (igual? (nth una-lista posicion) (nth otra-lista posicion)) (recur una-lista otra-lista (inc posicion))
     :else false
   )
 )
@@ -794,7 +794,7 @@
     (= (count lista) 1) (nth lista 0)
     (not (sequential? (nth lista 0))) (generar-mensaje-error :wrong-type-arg "append" (nth lista 0))  
     (not (sequential? (nth lista 1))) (generar-mensaje-error :wrong-type-arg "append" (nth lista 1))  
-    :else (append-recursivo (concat (list (concat (first lista) (nth lista 1))) (drop 2 lista)))
+    :else (recur (concat (list (concat (first lista) (nth lista 1))) (drop 2 lista)))
   )
 )
 
@@ -812,7 +812,7 @@
 (defn equal-recursivo [lista posicion]
   (cond 
     (>= posicion (count lista)) (symbol "#t")    
-    (igual? (first lista) (nth lista posicion)) (equal-recursivo lista (inc posicion))
+    (igual? (first lista) (nth lista posicion)) (recur lista (inc posicion))
     :else (symbol "#f")   
   )
 )
@@ -853,7 +853,7 @@
   (cond
     (= (count lista) 1) (generar-mensaje-error :io-ports-not-implemented "read")
     (> (count lista) 1) (generar-mensaje-error :wrong-number-args-prim-proc "read")
-    :else (leer-entrada)
+    :else (restaurar-bool (read-string (proteger-bool-en-str (leer-entrada))))
   )
 )
 
@@ -861,7 +861,7 @@
   (cond
     (<= (count lista) posicion) contador
     (not (number? (nth lista posicion))) (generar-mensaje-error :wrong-type-arg2 "+" (nth lista posicion))
-    :else (sumar-recursivo lista (+ contador (nth lista posicion)) (inc posicion))
+    :else (recur lista (+ contador (nth lista posicion)) (inc posicion))
   )
 )
 
@@ -895,7 +895,7 @@
   (cond
     (<= (count lista) posicion) contador
     (not (number? (nth lista posicion))) (generar-mensaje-error :wrong-type-arg2 "-" (nth lista posicion))
-    :else (restar-recursivo lista (- contador (nth lista posicion)) (inc posicion))
+    :else (recur lista (- contador (nth lista posicion)) (inc posicion))
   )
 )
 
@@ -931,7 +931,7 @@
     (<= (count lista) posicion-segundo) (symbol "#t")
     (not (number? (nth lista posicion-segundo))) (generar-mensaje-error :wrong-type-arg2 "<" (nth lista posicion-segundo))
     (>= (nth lista posicion-primero) (nth lista posicion-segundo)) (symbol "#f")
-    :else (menor-recursivo lista (inc posicion-primero) (inc posicion-segundo))
+    :else (recur lista (inc posicion-primero) (inc posicion-segundo))
   )
 )
 ; user=> (fnc-menor ())
@@ -969,7 +969,7 @@
     (<= (count lista) posicion-segundo) (symbol "#t")
     (not (number? (nth lista posicion-segundo))) (generar-mensaje-error :wrong-type-arg2 ">" (nth lista posicion-segundo))
     (<= (nth lista posicion-primero) (nth lista posicion-segundo)) (symbol "#f")
-    :else (mayor-recursivo lista (inc posicion-primero) (inc posicion-segundo))
+    :else (recur lista (inc posicion-primero) (inc posicion-segundo))
   )
 )
 ; user=> (fnc-mayor ())
@@ -1007,7 +1007,7 @@
     (<= (count lista) posicion-segundo) (symbol "#t")
     (not (number? (nth lista posicion-segundo))) (generar-mensaje-error :wrong-type-arg2 ">=" (nth lista posicion-segundo))
     (< (nth lista posicion-primero) (nth lista posicion-segundo)) (symbol "#f")
-    :else (mayor-recursivo lista (inc posicion-primero) (inc posicion-segundo))
+    :else (recur lista (inc posicion-primero) (inc posicion-segundo))
   )
 )
 
@@ -1068,6 +1068,7 @@
           nombre-funcion (if cantidad-parametros-necesarios (nth clave 0) '())
           parametros-funcion (if cantidad-parametros-necesarios (rest clave))
           funcion-lambda (list (symbol "lambda") parametros-funcion valor)
+          ambiente2 ambiente
     ]
     (cond
       (or (number? nombre-funcion) (sequential? nombre-funcion)) (list (generar-mensaje-error :bad-variable "define" lista) ambiente)    
@@ -1096,14 +1097,15 @@
 (defn evaluar-define[lista ambiente]
   "Evalua una expresion `define`. Devuelve una lista con el resultado y un ambiente actualizado con la definicion."
   (let [   
-           cantidad-parametros-necesarios (= (count lista) 3)
-           clave (if cantidad-parametros-necesarios (nth lista 1))
-           valor (if cantidad-parametros-necesarios (nth lista 2))
+           cantidad-parametros-necesarios-con-lambda (>= (count lista) 3)
+           cantidad-parametros-necesarios-sin-lambda (= (count lista) 3)
+           clave (if cantidad-parametros-necesarios-con-lambda (nth lista 1))
+           valor (if cantidad-parametros-necesarios-con-lambda (nth lista 2))
     ]
     (cond    
-      (not cantidad-parametros-necesarios) (list (generar-mensaje-error :missing-or-extra "define" lista) ambiente)
       (number? clave) (list (generar-mensaje-error :bad-variable "define" lista) ambiente)
       (sequential? clave) (generar-funcion-lambda lista ambiente)
+      (not cantidad-parametros-necesarios-sin-lambda) (list (generar-mensaje-error :missing-or-extra "define" lista) ambiente)
       :else (list (symbol "#<unspecified>") (actualizar-amb ambiente clave valor))      
     )
   )
@@ -1161,7 +1163,7 @@
   ]
     (cond
       termine-de-recorrer (list (symbol "#f") ambiente)      
-      (es-booleano? (str elemento-en-posicion)) (if (es-verdadero elemento-en-posicion) (list elemento-en-posicion ambiente) (recorrer-y-evaluar lista ambiente (inc posicion)))
+      (es-booleano? (str elemento-en-posicion)) (if (es-verdadero elemento-en-posicion) (list elemento-en-posicion ambiente) (recur lista ambiente (inc posicion)))
       :else (evaluar elemento-en-posicion ambiente)
     )
   )

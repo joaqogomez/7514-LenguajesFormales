@@ -260,7 +260,7 @@
 
 (deftest test-fnc-read
   (testing "Testeo la funcion fnc-read"
-    (is (= "(hola mundo)"
+    (is (= (list (symbol "hola") (symbol "mundo"))
         (with-in-str "(hola\nmundo)" (fnc-read ()))))
     (is (= (list (symbol ";ERROR:") (symbol "read:") (symbol "Use") (symbol "of")(symbol "I/O")(symbol "ports")(symbol "not")(symbol "implemented"))   
         (fnc-read '(1))))
