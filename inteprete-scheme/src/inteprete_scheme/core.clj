@@ -220,7 +220,7 @@
     (igual? fnc 'append)  (fnc-append lae)
     (igual? fnc 'car)  (fnc-car lae)
     (igual? fnc 'cdr)  (fnc-cdr lae)
-    (igual? fnc 'env)  (fnc-env lae)
+    (igual? fnc 'env)  (fnc-env lae amb)
     (igual? fnc 'not)  (fnc-not lae)
     (igual? fnc 'cons)  (fnc-cons lae)
     (igual? fnc 'list)  (fnc-list lae)
@@ -616,6 +616,22 @@
   (contar-parentesis (re-seq #"[()]" una-cadena) 0 0)
 )
 
+(defn recorrer-elementos-y-actualizar-amb [ambiente clave valor posicion]   
+  (cond
+    (>= posicion  (count ambiente)) ambiente
+    (= (rem posicion 2) 0) (recur ambiente clave valor (inc posicion)) 
+    :else
+      (let [
+        puedo-reemplazar  (= (nth ambiente (dec posicion)) clave)
+        ambiente-a-vector (into [] ambiente)
+        ambiente-nuevo-vector (if puedo-reemplazar (assoc ambiente-a-vector posicion valor) ambiente)
+        ambiente-nuevo-lista (reverse (into () ambiente-nuevo-vector))
+        ]
+          (recur ambiente-nuevo-lista clave valor (inc posicion)) 
+     )
+  )  
+)
+
 ; user=> (actualizar-amb '(a 1 b 2 c 3) 'd 4)
 ; (a 1 b 2 c 3 d 4)
 ; user=> (actualizar-amb '(a 1 b 2 c 3) 'b 4)
@@ -630,7 +646,8 @@
   (cond
     (error? valor) ambiente
     (error?(buscar clave ambiente)) (reverse (into () (conj (conj (into [] ambiente) clave) valor)))
-    :else (replace {(buscar clave ambiente) valor} ambiente))
+    :else (recorrer-elementos-y-actualizar-amb ambiente clave valor 0)
+  )
 )
 
 (defn buscar-recursivo [clave lista posicion encontre-clave]
@@ -1111,7 +1128,7 @@
       (number? clave) (list (generar-mensaje-error :bad-variable "define" lista) ambiente)
       (sequential? clave) (generar-funcion-lambda lista ambiente)
       (not cantidad-parametros-necesarios-sin-lambda) (list (generar-mensaje-error :missing-or-extra "define" lista) ambiente)
-      :else (list (symbol "#<unspecified>") (actualizar-amb ambiente clave valor))      
+      :else (list (symbol "#<unspecified>") (actualizar-amb ambiente clave (first(evaluar valor ambiente))))      
     )
   )
 )
@@ -1208,13 +1225,14 @@
            cantidad-parametros-necesarios (= (count lista) 3)
            clave (if cantidad-parametros-necesarios (nth lista 1))
            valor (if cantidad-parametros-necesarios (nth lista 2))
-           buscar-en-ambiente (buscar clave ambiente)           
+           buscar-en-ambiente (buscar clave ambiente)
+           valor-evaluado (if cantidad-parametros-necesarios (first(evaluar valor ambiente)))           
     ]
     (cond    
       (not cantidad-parametros-necesarios) (list (generar-mensaje-error :missing-or-extra "set!" lista) ambiente)
       (or (number? clave) (sequential? clave)) (list (generar-mensaje-error :bad-variable "set!" clave) ambiente)
       (error? buscar-en-ambiente) (list buscar-en-ambiente ambiente)
-      :else (list (symbol "#<unspecified>") (actualizar-amb ambiente clave (first(evaluar valor ambiente))))      
+      :else (list (symbol "#<unspecified>") (actualizar-amb ambiente clave valor-evaluado))
     )
   )
 )

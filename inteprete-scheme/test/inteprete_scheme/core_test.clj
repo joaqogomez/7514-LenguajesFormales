@@ -242,6 +242,8 @@
         (actualizar-amb '(a 1 b 2 c 3) 'd 4)))
     (is (= '(a 1 b 4 c 3)
         (actualizar-amb '(a 1 b 2 c 3) 'b 4)))
+    (is (= '(a 1 b 4 c 3)
+        (actualizar-amb '(a 1 b b c 3) 'b 4)))
     (is (= '(a 1 b 2 c 3)
         (actualizar-amb '(a 1 b 2 c 3) 'b (list (symbol ";ERROR:") 'mal 'hecho))))
     (is (= '(b 7)
