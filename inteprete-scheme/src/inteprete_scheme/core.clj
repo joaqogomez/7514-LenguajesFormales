@@ -756,10 +756,12 @@
     (>= posicion  (count lista)) lista
     (seq? (nth lista posicion)) 
       (let [
-        reemplazar-elementos-lista (map #(buscar-reemplazo-symbol %) (nth lista posicion))    
-        lista-nueva-con-lista (replace {(nth lista posicion) reemplazar-elementos-lista} lista)
+        lista-elementos-reemplazados (recorrer-elementos-y-reemplazar (nth lista posicion) 0)
+        lista-a-vector (into [] lista)
+        nuevo-vector (assoc lista-a-vector  posicion lista-elementos-reemplazados)
+        lista-nueva (reverse (into () nuevo-vector))    
         ]       
-          (recur lista-nueva-con-lista (inc posicion))    
+          (recur lista-nueva (inc posicion))    
       )
     :else
       (let [
@@ -1086,11 +1088,11 @@
   (let [             
           clave (nth lista 1)
           valor (rest (rest lista))
-          valores-funcion (if (= (count valor) 1) (nth valor 0) valor)
+          valores-funcion (if (= (count valor) 1) (list(nth valor 0)) valor)
           cantidad-parametros-necesarios (>= (count clave) 2)
           nombre-funcion (if cantidad-parametros-necesarios (nth clave 0) '())
           parametros-funcion (if cantidad-parametros-necesarios (rest clave))
-          funcion-lambda (list (symbol "lambda") parametros-funcion valores-funcion)
+          funcion-lambda (concat (list (symbol "lambda") parametros-funcion) valores-funcion)
     ]
     (cond
       (or (number? nombre-funcion) (seq? nombre-funcion)) (list (generar-mensaje-error :bad-variable "define" lista) ambiente)    

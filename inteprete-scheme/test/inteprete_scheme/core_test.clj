@@ -339,6 +339,8 @@
         (evaluar-define '(define () 2) '(x 1))))
     (is (= (list (list (symbol ";ERROR:") (symbol "define:") (symbol "bad") (symbol "variable")'(define 2 x)) '(x 1))
         (evaluar-define '(define 2 x) '(x 1))))
+    (is (= (list (symbol "#<unspecified>") (list 'x 1 'f '(lambda (x) (display x) (newline) (+ x 1))))
+        (evaluar-define '(define (f x) (display x) (newline) (+ x 1)) '(x 1))))
   ) 
 )
 
