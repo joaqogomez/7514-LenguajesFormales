@@ -622,7 +622,7 @@
     (= (rem posicion 2) 0) (recur ambiente clave valor (inc posicion)) 
     :else
       (let [
-        puedo-reemplazar  (= (nth ambiente (dec posicion)) clave)
+        puedo-reemplazar  (igual? (nth ambiente (dec posicion)) clave)
         ambiente-a-vector (into [] ambiente)
         ambiente-nuevo-vector (if puedo-reemplazar (assoc ambiente-a-vector posicion valor) ambiente)
         ambiente-nuevo-lista (reverse (into () ambiente-nuevo-vector))
@@ -677,7 +677,7 @@
 (defn error? [lista]
   "Devuelve true o false, segun sea o no el arg. una lista con `;ERROR:` o `;WARNING:` como primer elemento."
   (cond
-    (not (sequential? lista)) false
+    (not (seq? lista)) false
     (= (count lista) 0) false
     :else (or (= (nth lista 0) (symbol ";ERROR:")) (= (nth lista 0) (symbol ";WARNING:")))
   )  
@@ -754,7 +754,7 @@
 (defn recorrer-elementos-y-reemplazar [lista posicion]   
   (cond
     (>= posicion  (count lista)) lista
-    (sequential? (nth lista posicion)) 
+    (seq? (nth lista posicion)) 
       (let [
         reemplazar-elementos-lista (map #(buscar-reemplazo-symbol %) (nth lista posicion))    
         lista-nueva-con-lista (replace {(nth lista posicion) reemplazar-elementos-lista} lista)
@@ -805,7 +805,7 @@
 (defn igual?[un-elemento otro-elemento]
   "Verifica la igualdad entre dos elementos al estilo de Scheme (case-insensitive)"
   (cond
-    (and (sequential? un-elemento) (sequential? otro-elemento)) (verificar-elementos-individuales un-elemento otro-elemento 0)
+    (and (seq? un-elemento) (seq? otro-elemento)) (verificar-elementos-individuales un-elemento otro-elemento 0)
     (not (= (type un-elemento) (type otro-elemento))) false
     :else (= (st/lower-case (str un-elemento)) (st/lower-case(str otro-elemento)))
   )
@@ -814,8 +814,8 @@
 (defn append-recursivo [lista]
   (cond
     (= (count lista) 1) (nth lista 0)
-    (not (sequential? (nth lista 0))) (generar-mensaje-error :wrong-type-arg "append" (nth lista 0))  
-    (not (sequential? (nth lista 1))) (generar-mensaje-error :wrong-type-arg "append" (nth lista 1))  
+    (not (seq? (nth lista 0))) (generar-mensaje-error :wrong-type-arg "append" (nth lista 0))  
+    (not (seq? (nth lista 1))) (generar-mensaje-error :wrong-type-arg "append" (nth lista 1))  
     :else (recur (concat (list (concat (first lista) (nth lista 1))) (drop 2 lista)))
   )
 )
@@ -1093,7 +1093,7 @@
           funcion-lambda (list (symbol "lambda") parametros-funcion valores-funcion)
     ]
     (cond
-      (or (number? nombre-funcion) (sequential? nombre-funcion)) (list (generar-mensaje-error :bad-variable "define" lista) ambiente)    
+      (or (number? nombre-funcion) (seq? nombre-funcion)) (list (generar-mensaje-error :bad-variable "define" lista) ambiente)    
       (not cantidad-parametros-necesarios) (list (generar-mensaje-error :missing-or-extra "define" lista) ambiente)      
       :else (list (symbol "#<unspecified>") (actualizar-amb ambiente nombre-funcion funcion-lambda))      
     )
@@ -1126,7 +1126,7 @@
     ]
     (cond    
       (number? clave) (list (generar-mensaje-error :bad-variable "define" lista) ambiente)
-      (sequential? clave) (generar-funcion-lambda lista ambiente)
+      (seq? clave) (generar-funcion-lambda lista ambiente)
       (not cantidad-parametros-necesarios-sin-lambda) (list (generar-mensaje-error :missing-or-extra "define" lista) ambiente)
       :else (list (symbol "#<unspecified>") (actualizar-amb ambiente clave (first(evaluar valor ambiente))))      
     )
@@ -1230,7 +1230,7 @@
     ]
     (cond    
       (not cantidad-parametros-necesarios) (list (generar-mensaje-error :missing-or-extra "set!" lista) ambiente)
-      (or (number? clave) (sequential? clave)) (list (generar-mensaje-error :bad-variable "set!" clave) ambiente)
+      (or (number? clave) (seq? clave)) (list (generar-mensaje-error :bad-variable "set!" clave) ambiente)
       (error? buscar-en-ambiente) (list buscar-en-ambiente ambiente)
       :else (list (symbol "#<unspecified>") (actualizar-amb ambiente clave valor-evaluado))
     )

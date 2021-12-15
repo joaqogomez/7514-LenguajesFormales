@@ -56,7 +56,7 @@
     (is (= true 
         (igual? '() '())))
     (is (= true 
-        (igual? '([a b] C) '((A B) C))))
+        (igual? (symbol "%t") (symbol "%t"))))
   ) 
 )
 
