@@ -78,6 +78,8 @@
         (fnc-equal? '(1 1 1 1))))
     (is (= (symbol "#f")   
         (fnc-equal? '(1 1 2 1))))
+    (is (= (symbol "#f")   
+        (fnc-equal? '((0 0) (0 4)))))
   ) 
 )
 
