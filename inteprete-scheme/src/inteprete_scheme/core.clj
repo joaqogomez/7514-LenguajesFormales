@@ -136,6 +136,8 @@
         (igual? (first expre) 'set!) (evaluar-set! expre amb)
         (igual? (first expre) 'quote) (evaluar-quote expre amb)
         (igual? (first expre) 'lambda) (evaluar-lambda expre amb)
+        (igual? (first expre) 'or) (evaluar-or expre amb)
+
          ;
          ;
          ;
@@ -677,7 +679,7 @@
   )
 )
 
-(defn buscar-reemplazo[string]
+(defn buscar-reemplazo-string[string]
   (cond
     (= string "#t") "%t"
     (= string "#T") "%T"
@@ -693,7 +695,7 @@
 
 (defn recorrer-y-cambiar-string [string posicion]
   (let [fin-string (+ 2 posicion)
-        nuevo-string  (reemplazar-en-string string posicion (buscar-reemplazo (str (subs string posicion fin-string))))     
+        nuevo-string  (reemplazar-en-string string posicion (buscar-reemplazo-string (str (subs string posicion fin-string))))     
        ]
       (cond    
         (>= fin-string (count string)) string
@@ -717,19 +719,29 @@
   )
 )
 
+(defn buscar-reemplazo-symbol[simbolo]
+  (cond
+    (= simbolo (symbol "%t")) (symbol "#t")
+    (= simbolo (symbol "%T")) (symbol "#T")
+    (= simbolo (symbol "%f")) (symbol "#f")
+    (= simbolo (symbol "%F")) (symbol "#F")
+    :else simbolo
+  )
+)
+
 (defn recorrer-elementos-y-reemplazar [lista posicion]   
   (cond
     (>= posicion  (count lista)) lista
     (sequential? (nth lista posicion)) 
       (let [
-        reemplazar-elementos-lista (map #(symbol(buscar-reemplazo (str %))) (nth lista posicion))    
+        reemplazar-elementos-lista (map #(buscar-reemplazo-symbol %) (nth lista posicion))    
         lista-nueva-con-lista (replace {(nth lista posicion) reemplazar-elementos-lista} lista)
         ]       
           (recorrer-elementos-y-reemplazar lista-nueva-con-lista (inc posicion))    
       )
     :else
       (let [
-        reemplazar-elemento-individual (symbol (buscar-reemplazo (str (nth lista posicion))))
+        reemplazar-elemento-individual  (buscar-reemplazo-symbol (nth lista posicion))
         lista-nueva (replace {(nth lista posicion) reemplazar-elemento-individual} lista)
         ]
           (recorrer-elementos-y-reemplazar lista-nueva (inc posicion)) 
@@ -1148,10 +1160,9 @@
     elemento-en-posicion (if (not termine-de-recorrer) (nth lista posicion))
   ]
     (cond
-      termine-de-recorrer (symbol "#f")      
-      (es-booleano? (str elemento-en-posicion)) (if (es-verdadero elemento-en-posicion) elemento-en-posicion (recorrer-y-evaluar lista ambiente (inc posicion)))
-      (evaluar elemento-en-posicion ambiente) elemento-en-posicion
-      :else (recorrer-y-evaluar lista ambiente (inc posicion))
+      termine-de-recorrer (list (symbol "#f") ambiente)      
+      (es-booleano? (str elemento-en-posicion)) (if (es-verdadero elemento-en-posicion) (list elemento-en-posicion ambiente) (recorrer-y-evaluar lista ambiente (inc posicion)))
+      :else (evaluar elemento-en-posicion ambiente)
     )
   )
 )
@@ -1170,7 +1181,7 @@
   "Evalua una expresion `or`.  Devuelve una lista con el resultado y un ambiente."
     (cond
       (= (count lista) 1) (list (symbol "#f") ambiente)
-      :else (list (recorrer-y-evaluar lista ambiente 1) ambiente)
+      :else (recorrer-y-evaluar lista ambiente 1)
     )
 )
 
