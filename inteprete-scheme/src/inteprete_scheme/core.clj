@@ -650,11 +650,11 @@
   )
 )
 
-(defn buscar-recursivo [clave lista posicion encontre-clave]
+(defn buscar-recursivo [clave lista posicion]
   (cond
     (>= posicion (count lista)) (generar-mensaje-error :unbound-variable clave)
-    (igual? (nth lista posicion) clave) (nth lista (inc posicion))    
-    :else (recur clave lista (inc posicion) false)
+    (and (igual? (nth lista posicion) clave) (= (rem posicion 2) 0)) (nth lista (inc posicion))    
+    :else (recur clave lista (inc posicion))
   )
 )
 
@@ -665,7 +665,7 @@
 (defn buscar [clave lista]
   "Busca una clave en un ambiente (una lista con claves en las posiciones impares [1, 3, 5...] y valores en las pares [2, 4, 6...]
    y devuelve el valor asociado. Devuelve un error :unbound-variable si no la encuentra."
-   (buscar-recursivo clave lista 0 false)
+   (buscar-recursivo clave lista 0)
 )
 
 ; user=> (error? (list (symbol ";ERROR:") 'mal 'hecho))
@@ -807,7 +807,7 @@
 (defn igual?[un-elemento otro-elemento]
   "Verifica la igualdad entre dos elementos al estilo de Scheme (case-insensitive)"
   (cond
-    (and (seq? un-elemento) (seq? otro-elemento)) (verificar-elementos-individuales un-elemento otro-elemento 0)
+    (and (seq? un-elemento) (seq? otro-elemento)) (verificar-elementos-individuales un-elemento otro-elemento 0)    
     (not (= (type un-elemento) (type otro-elemento))) false
     :else (= (st/lower-case (str un-elemento)) (st/lower-case(str otro-elemento)))
   )
@@ -1089,14 +1089,15 @@
           clave (nth lista 1)
           valor (rest (rest lista))
           valores-funcion (if (= (count valor) 1) (list(nth valor 0)) valor)
-          cantidad-parametros-necesarios (>= (count clave) 2)
-          nombre-funcion (if cantidad-parametros-necesarios (nth clave 0) '())
-          parametros-funcion (if cantidad-parametros-necesarios (rest clave))
+          cantidad-parametros-necesarios-nombre (>= (count clave) 1)
+          cantidad-parametros-necesarios-funcion (>= (count clave) 2)
+          nombre-funcion (if cantidad-parametros-necesarios-nombre (nth clave 0) '())
+          parametros-funcion (if cantidad-parametros-necesarios-funcion (rest clave))
           funcion-lambda (concat (list (symbol "lambda") parametros-funcion) valores-funcion)
     ]
     (cond
       (or (number? nombre-funcion) (seq? nombre-funcion)) (list (generar-mensaje-error :bad-variable "define" lista) ambiente)    
-      (not cantidad-parametros-necesarios) (list (generar-mensaje-error :missing-or-extra "define" lista) ambiente)      
+      (not cantidad-parametros-necesarios-nombre) (list (generar-mensaje-error :missing-or-extra "define" lista) ambiente)      
       :else (list (symbol "#<unspecified>") (actualizar-amb ambiente nombre-funcion funcion-lambda))      
     )
   )

@@ -358,6 +358,8 @@
         (evaluar-or (list 'or (symbol "#f") 5) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))))
     (is (= (list (symbol "#f") (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))
         (evaluar-or (list 'or (symbol "#f")) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))))
+    (is (= (list 3 (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))
+        (evaluar-or (list 'or (+ 1 2)) (list (symbol "#f") (symbol "#f") (symbol "#t") (symbol "#t")))))
   ) 
 )
 
