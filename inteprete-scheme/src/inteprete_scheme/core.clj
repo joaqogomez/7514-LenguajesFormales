@@ -1144,6 +1144,10 @@
   (or (= (symbol "#t") un-booleano) (= (symbol "#T") un-booleano))
 )
 
+(defn es-falso [un-booleano]
+  (or (= (symbol "#f") un-booleano) (= (symbol "#f") un-booleano))
+)
+
 (defn evaluar-condicion [condicion]
   (cond
     (es-booleano? (str condicion)) (es-verdadero condicion)
@@ -1179,15 +1183,11 @@
         hacer-si-falso (if (= (count lista) 4) (nth lista 3) (symbol "#<unspecified>"))
         evaluar-verdadero (evaluar hacer-si-verdadero ambiente)
         evaluar-falso (if (= hacer-si-falso (symbol "#<unspecified>")) (list (symbol "#<unspecified>") ambiente) (evaluar hacer-si-falso ambiente) )         
-        condicion-if (evaluar-condicion condicion)         
+        condicion-if (first (evaluar condicion ambiente))         
         ]
-        (if condicion-if evaluar-verdadero evaluar-falso)
+        (if (not (es-falso condicion-if)) evaluar-verdadero evaluar-falso)
      )
   )
-)
-
-(defn es-falso [un-booleano]
-  (or (= (symbol "#f") un-booleano) (= (symbol "#f") un-booleano))
 )
 
 (defn recorrer-y-evaluar [lista ambiente posicion]
