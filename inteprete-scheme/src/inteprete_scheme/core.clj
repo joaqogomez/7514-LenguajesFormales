@@ -716,10 +716,13 @@
 )
 
 (defn recorrer-y-cambiar-string [string posicion]
-  (let [fin-string (+ 2 posicion)
-        nuevo-string  (reemplazar-en-string string posicion (buscar-reemplazo-string (str (subs string posicion fin-string))))     
+  (let [
+        puedo-recorrer (> (count string) 1)
+        fin-string (if puedo-recorrer (+ 2 posicion))
+        nuevo-string  (if puedo-recorrer (reemplazar-en-string string posicion (buscar-reemplazo-string (str (subs string posicion fin-string)))))     
        ]
-      (cond    
+      (cond
+        (not puedo-recorrer) string
         (>= fin-string (count string)) string
         (es-booleano? (str (subs string posicion fin-string))) (recur nuevo-string (inc posicion))
         :else (recur string (inc posicion))
@@ -780,6 +783,7 @@
 (defn restaurar-bool[lista]
   "Cambia, en un codigo leido con read-string, %t por #t y %f por #f (y sus respectivas versiones en mayusculas)."
   (cond
+    (not (seq? lista)) lista
     (= 0 (count lista)) lista
     :else (recorrer-elementos-y-reemplazar lista 0)
   )  
