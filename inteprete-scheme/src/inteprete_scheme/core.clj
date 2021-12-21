@@ -1186,14 +1186,18 @@
   )
 )
 
+(defn es-falso [un-booleano]
+  (or (= (symbol "#f") un-booleano) (= (symbol "#f") un-booleano))
+)
+
 (defn recorrer-y-evaluar [lista ambiente posicion]
   (let [ termine-de-recorrer (<= (count lista) posicion)
-    elemento-en-posicion (if (not termine-de-recorrer) (nth lista posicion))
+    elemento-evaluado-en-posicion (if (not termine-de-recorrer) (evaluar (nth lista posicion) ambiente))
   ]
     (cond
       termine-de-recorrer (list (symbol "#f") ambiente)      
-      (es-booleano? (str elemento-en-posicion)) (if (es-verdadero elemento-en-posicion) (list elemento-en-posicion ambiente) (recur lista ambiente (inc posicion)))
-      :else (evaluar elemento-en-posicion ambiente)
+      (es-falso (first elemento-evaluado-en-posicion)) (recur lista ambiente (inc posicion))
+      :else elemento-evaluado-en-posicion
     )
   )
 )
