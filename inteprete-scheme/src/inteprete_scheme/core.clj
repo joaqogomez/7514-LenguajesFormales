@@ -1148,13 +1148,6 @@
   (or (= (symbol "#f") un-booleano) (= (symbol "#f") un-booleano))
 )
 
-(defn evaluar-condicion [condicion]
-  (cond
-    (es-booleano? (str condicion)) (es-verdadero condicion)
-    :else condicion
-  )
-)
-
 ; user=> (evaluar-if '(if 1 2) '(n 7))
 ; (2 (n 7))
 ; user=> (evaluar-if '(if 1 n) '(n 7))
@@ -1180,24 +1173,20 @@
     (let [
         condicion (nth lista 1)
         hacer-si-verdadero (nth lista 2)
-        hacer-si-falso (if (= (count lista) 4) (nth lista 3) (symbol "#<unspecified>"))
-        evaluar-verdadero (evaluar hacer-si-verdadero ambiente)
-        evaluar-falso (if (= hacer-si-falso (symbol "#<unspecified>")) (list (symbol "#<unspecified>") ambiente) (evaluar hacer-si-falso ambiente) )         
-        condicion-if (first (evaluar condicion ambiente))         
+        hacer-si-falso (if (= (count lista) 4) (nth lista 3) (symbol "#<unspecified>"))     
         ]
-        (if (not (es-falso condicion-if)) evaluar-verdadero evaluar-falso)
+        (if (not (es-falso (first (evaluar condicion ambiente)))) (evaluar hacer-si-verdadero ambiente) (if (= hacer-si-falso (symbol "#<unspecified>")) (list (symbol "#<unspecified>") ambiente) (evaluar hacer-si-falso ambiente) ))
      )
   )
 )
 
 (defn recorrer-y-evaluar [lista ambiente posicion]
-  (let [ termine-de-recorrer (<= (count lista) posicion)
-    elemento-evaluado-en-posicion (if (not termine-de-recorrer) (evaluar (nth lista posicion) ambiente))
+  (let [ termine-de-recorrer (<= (count lista) posicion)    
   ]
     (cond
       termine-de-recorrer (list (symbol "#f") ambiente)      
-      (es-falso (first elemento-evaluado-en-posicion)) (recur lista ambiente (inc posicion))
-      :else elemento-evaluado-en-posicion
+      (es-falso (first (evaluar (nth lista posicion) ambiente))) (recur lista ambiente (inc posicion))
+      :else (evaluar (nth lista posicion) ambiente)
     )
   )
 )
