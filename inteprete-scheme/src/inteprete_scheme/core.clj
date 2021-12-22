@@ -1148,6 +1148,7 @@
   (or (= (symbol "#f") un-booleano) (= (symbol "#f") un-booleano))
 )
 
+
 ; user=> (evaluar-if '(if 1 2) '(n 7))
 ; (2 (n 7))
 ; user=> (evaluar-if '(if 1 n) '(n 7))
@@ -1181,12 +1182,13 @@
 )
 
 (defn recorrer-y-evaluar [lista ambiente posicion]
-  (let [ termine-de-recorrer (<= (count lista) posicion)    
+  (let [ termine-de-recorrer (<= (count lista) posicion)
+         elemento-evaluado (if (not termine-de-recorrer) (evaluar (nth lista posicion) ambiente))    
   ]
     (cond
       termine-de-recorrer (list (symbol "#f") ambiente)      
-      (es-falso (first (evaluar (nth lista posicion) ambiente))) (recur lista ambiente (inc posicion))
-      :else (evaluar (nth lista posicion) ambiente)
+      (es-falso (first elemento-evaluado)) (recur lista ambiente (inc posicion))
+      :else elemento-evaluado
     )
   )
 )
