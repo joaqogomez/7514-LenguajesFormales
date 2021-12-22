@@ -811,7 +811,8 @@
 (defn igual?[un-elemento otro-elemento]
   "Verifica la igualdad entre dos elementos al estilo de Scheme (case-insensitive)"
   (cond
-    (and (seq? un-elemento) (seq? otro-elemento)) (verificar-elementos-individuales un-elemento otro-elemento 0)    
+    (and (seq? un-elemento) (seq? otro-elemento)) (verificar-elementos-individuales un-elemento otro-elemento 0)
+    (and (number? un-elemento) (number? otro-elemento)) (= un-elemento otro-elemento)    
     (not (= (type un-elemento) (type otro-elemento))) false
     :else (= (st/lower-case (str un-elemento)) (st/lower-case(str otro-elemento)))
   )
@@ -1240,3 +1241,4 @@
 )
 
 ; Al terminar de cargar el archivo en el REPL de Clojure, se debe devolver true.
+true
