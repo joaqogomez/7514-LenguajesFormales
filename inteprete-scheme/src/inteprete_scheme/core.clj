@@ -52,6 +52,7 @@
 (declare fnc-newline)
 (declare fnc-reverse)
 (declare fnc-mayor-o-igual)
+(declare fnc-ceiling)
 
 ; Funciones auxiliares
 
@@ -100,7 +101,7 @@
                'if 'if 'lambda 'lambda 'length 'length 'list 'list 'list? 'list? 'load 'load
                'newline 'newline 'nil (symbol "#f") 'not 'not 'null? 'null? 'or 'or 'quote 'quote
                'read 'read 'reverse 'reverse 'set! 'set! (symbol "#f") (symbol "#f")
-               (symbol "#t") (symbol "#t") '+ '+ '- '- '< '< '> '> '>= '>=)))
+               (symbol "#t") (symbol "#t") '+ '+ '- '- '< '< '> '> '>= '>= 'ceiling 'ceiling)))
   ([amb]
    (print "> ") (flush)
    (try
@@ -210,6 +211,7 @@
     (= fnc '-)            (fnc-restar lae)
     (= fnc '>)            (fnc-mayor lae)
     (= fnc '>=)            (fnc-mayor-o-igual lae)
+    (igual? fnc 'ceiling)        (fnc-ceiling lae)
     ;
     ;
     ; Si la funcion primitiva esta identificada por un simbolo, puede determinarse mas rapido que hacer con ella
@@ -240,6 +242,15 @@
 
     :else (generar-mensaje-error :wrong-type-apply fnc)))
 
+(defn fnc-ceiling [lista] 
+  (cond
+    (= (count lista) 1) (cond
+        (number? (first lista)) (int (Math/ceil (first lista)))
+        :else (generar-mensaje-error :wrong-type-arg 'ceiling lista)
+    )
+    :else (generar-mensaje-error :wrong-number-args 'ceiling)   
+  )
+)
 
 (defn fnc-car
   "Devuelve el primer elemento de una lista."
