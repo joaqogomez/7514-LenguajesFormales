@@ -94,6 +94,28 @@
   ) 
 )
 
+
+(deftest test-fnc-multiplicar
+  (testing "Testeo la funcion fnc-multiplicar"
+    (is (= 1
+        (fnc-multiplicar ())))
+    (is (= 3  
+        (fnc-multiplicar '(3))))
+    (is (= 12  
+        (fnc-multiplicar '(3 4))))
+    (is (= 60
+        (fnc-multiplicar '(3 4 5))))
+    (is (= 360  
+        (fnc-multiplicar '(3 4 5 6))))
+    (is (= (list (symbol ";ERROR:") (symbol "*:") (symbol "Wrong") (symbol "type") (symbol "in") (symbol "arg1") (symbol "A")))  
+        (fnc-multiplicar '(A 4 5 6)))
+    (is (= (list (symbol ";ERROR:") (symbol "*:") (symbol "Wrong") (symbol "type") (symbol "in") (symbol "arg2") (symbol "A"))) 
+        (fnc-multiplicar '(3 A 5 6)))
+    (is (= (list (symbol ";ERROR:") (symbol "*:") (symbol "Wrong") (symbol "type") (symbol "in") (symbol "arg2") (symbol "A"))) 
+        (fnc-multiplicar '(3 4 A 6)))
+  ) 
+)
+
 (deftest test-fnc-sumar
   (testing "Testeo la funcion fnc-sumar"
     (is (= 0

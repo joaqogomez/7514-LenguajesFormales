@@ -52,6 +52,7 @@
 (declare fnc-newline)
 (declare fnc-reverse)
 (declare fnc-mayor-o-igual)
+(declare fnc-multiplicar)
 
 ; Funciones auxiliares
 
@@ -100,7 +101,7 @@
                'if 'if 'lambda 'lambda 'length 'length 'list 'list 'list? 'list? 'load 'load
                'newline 'newline 'nil (symbol "#f") 'not 'not 'null? 'null? 'or 'or 'quote 'quote
                'read 'read 'reverse 'reverse 'set! 'set! (symbol "#f") (symbol "#f")
-               (symbol "#t") (symbol "#t") '+ '+ '- '- '< '< '> '> '>= '>=)))
+               (symbol "#t") (symbol "#t") '+ '+ '- '- '< '< '> '> '>= '>= '* '*)))
   ([amb]
    (print "> ") (flush)
    (try
@@ -210,6 +211,7 @@
     (= fnc '-)            (fnc-restar lae)
     (= fnc '>)            (fnc-mayor lae)
     (= fnc '>=)            (fnc-mayor-o-igual lae)
+    (= fnc '*)            (fnc-multiplicar lae)
     ;
     ;
     ; Si la funcion primitiva esta identificada por un simbolo, puede determinarse mas rapido que hacer con ella
@@ -883,6 +885,23 @@
     (= (count lista) 1) (generar-mensaje-error :io-ports-not-implemented "read")
     (> (count lista) 1) (generar-mensaje-error :wrong-number-args-prim-proc "read")
     :else (restaurar-bool (read-string (proteger-bool-en-str (leer-entrada))))
+  )
+)
+
+(defn multiplicar-recursivo[lista contador posicion]
+  (cond
+    (<= (count lista) posicion) contador
+    (not (number? (nth lista posicion))) (generar-mensaje-error :wrong-type-arg2 "*" (nth lista posicion))
+    :else (recur lista (* contador (nth lista posicion)) (inc posicion))
+  )
+)
+
+(defn fnc-multiplicar[lista]
+  "Multiplica los elementos de una lista."
+  (cond
+    (= (count lista) 0) 1
+    (not (number? (nth lista 0))) (generar-mensaje-error :wrong-type-arg1 "*" (nth lista 0))
+    :else (multiplicar-recursivo lista (nth lista 0) 1)
   )
 )
 
